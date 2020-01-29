@@ -1,0 +1,6 @@
+name: newick_utils
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - newick_utils=1.6

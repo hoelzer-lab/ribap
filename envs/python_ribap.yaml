@@ -1,0 +1,10 @@
+name: python_ribap
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.7
+  - parallel=20170422
+  - networkx=2.2
+  - docopt=0.6.2
+  - biopython=1.74

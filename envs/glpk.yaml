@@ -1,0 +1,6 @@
+name: glpk
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - glpk=4.65
