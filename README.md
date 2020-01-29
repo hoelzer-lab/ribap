@@ -12,8 +12,11 @@ Roary ILP Bacterial Annotation Pipeline
 * by Kevin Lamkiewicz & Martin H&ouml;lzer
 * **this tool is currently under heavy development, so expect some bugs but feel free to report issues**
 
-# What is this?
+Annotate your protein sequences with Prokka and determine a pan genome with Roary. This genome is refined with the usage of ILPs that solve the best matching for each pairwise strain mmseqs2 comparison.
 
+# What is this?
+A common task when you have a bunch of bacterial genomes in your hands is the calculation of a _core gene set_. So, we want to know, which genes are homologous and shared between certain bacteria. However, defining homology only based an sequence 
+similarity often underestimates the _true_ core gene set, in particular when diverse species are compared. RIBAP combines sequence homology information from [Roary](https://github.com/sanger-pathogens/Roary) with smart pairwise [ILP](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/) calculations to produce a more complete core gene set - even on genus level. First, RIBAP performs annotations with [Prokka](https://github.com/tseemann/prokka), calculates the core gene set using [Roary](https://github.com/sanger-pathogens/Roary) and pairwise [ILPs](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/), and finally visualizes the results in an interactive HTML table garnished with protein multiple sequence alignments and trees. RIBAP comes with Nextflow and Docker/Conda support for easy execution.      
 
 # How can I give it a try?
 Easy, you just need a working `nextflow` and `docker` or `conda` installation, see below! 
