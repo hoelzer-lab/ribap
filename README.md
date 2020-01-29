@@ -1,12 +1,22 @@
 # RIBAP
+Roary ILP Bacterial Annotation Pipeline
 
 ![](https://img.shields.io/badge/nextflow-19.10.0-brightgreen)
 ![](https://img.shields.io/badge/uses-docker-blue.svg)
 ![](https://img.shields.io/badge/uses-conda-yellow.svg)
+![](https://img.shields.io/badge/licence-GPL--3.0-lightgrey.svg)
 
-hoelzer.martin@gmail.com
+[![Twitter Follow](https://img.shields.io/twitter/follow/martinhoelzer.svg?style=social)](https://twitter.com/martinhoelzer) 
+[![Twitter Follow](https://img.shields.io/twitter/follow/klamkiewicz.svg?style=social)](https://twitter.com/klamkiewicz) 
 
-# How does it work?
+* by Kevin Lamkiewicz & Martin H&ouml;lzer
+* **this tool is currently under heavy development, so expect some bugs but feel free to report issues**
+
+# What is this?
+
+
+# How can I give it a try?
+Easy, you just need a working `nextflow` and `docker` or `conda` installation, see below! 
 
 ## Installation
 
