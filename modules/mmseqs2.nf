@@ -19,11 +19,11 @@ process mmseqs2 {
     #Creating DB
     mmseqs createdb mmseq2/all_proteins.fa \$MMSEQDB
     #Creating Index#
-    mmseqs createindex \$MMSEQDB mmseq2/tmp
+    mmseqs createindex --threads ${task.cpus} \$MMSEQDB mmseq2/tmp
     #Starting MMSeqs2 Search
-    mmseqs search \$MMSEQDB \$MMSEQDB "\${MMSEQDB%.*}_result" mmseq2/tmp -a
+    mmseqs search --threads ${task.cpus} \$MMSEQDB \$MMSEQDB "\${MMSEQDB%.*}_result" mmseq2/tmp -a
     #Converting results
-    mmseqs convertalis "\$MMSEQDB" "\$MMSEQDB" "\${MMSEQDB%.*}_result" "\${MMSEQDB%.*}_result.csv"
+    mmseqs convertalis --threads ${task.cpus} \$MMSEQDB \$MMSEQDB "\${MMSEQDB%.*}_result" "\${MMSEQDB%.*}_result.csv"
 
     #create single .tsv
     MMSEQ="\${MMSEQDB%.*}_result.csv"
