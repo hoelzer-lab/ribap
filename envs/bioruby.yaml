@@ -1,0 +1,6 @@
+name: basics
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - rb-bio=2.0.1
