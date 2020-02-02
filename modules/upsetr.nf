@@ -27,9 +27,9 @@ process upsetr {
           width=10, 
           height=8, 
           pointsize=12)
-      #nsets = 20, nintersects = 40
       upset(fromList(sets), sets = names(sets),
           mainbar.y.label = "No. of common genes", sets.x.label = "No. of identified genes", 
+          nsets = 20, nintersects = 40,
           order.by = "freq", sets.bar.color = "#56B4E9", keep.order = F, 
           text.scale = 1.4, point.size = 2.6, line.size = 0.8, set_size.show = TRUE)
       dev.off()
