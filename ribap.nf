@@ -73,6 +73,8 @@ include './modules/fasttree' params(output: params.output)
 include './modules/nw_display' params(output: params.output)
 include './modules/combine_msa' params(output: params.output)
 include './modules/generate_html' params(output: params.output)
+include './modules/generate_upsetr_input' params(output: params.output)
+include './modules/upsetr' params(output: params.output)
 if (params.tree) {include './modules/raxml' params(output: params.output)}
 
 
@@ -132,6 +134,9 @@ workflow {
 
   build_html_ch = identity_ch.join(combine_roary_ilp.out[0])
   generate_html(build_html_ch, roary.out.collect(), combine_roary_ilp.out[1].collect(), nw_display.out.collect())
+
+  generate_upsetr_input(identity_ch.join(combine_roary_ilp.out[0]), strain_ids.out)
+  upsetr(generate_upsetr_input.out[1])
 
   if (params.tree) {raxml(combine_msa.out)}
 }
