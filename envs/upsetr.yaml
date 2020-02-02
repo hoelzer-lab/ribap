@@ -1,0 +1,6 @@
+name: upsetr
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - r-upsetr=1.4.0
