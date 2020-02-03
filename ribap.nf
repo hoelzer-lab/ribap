@@ -74,7 +74,8 @@ include './modules/nw_display' params(output: params.output)
 include './modules/combine_msa' params(output: params.output)
 include './modules/generate_html' params(output: params.output)
 include './modules/generate_upsetr_input' params(output: params.output)
-include './modules/upsetr' params(output: params.output)
+include upsetr from './modules/upsetr' params(output: params.output)
+if (params.sets) {include upsetr_subset from './modules/upsetr' params(output: params.output, sets: params.sets)}
 if (params.tree) {include './modules/raxml' params(output: params.output)}
 
 
@@ -137,6 +138,7 @@ workflow {
 
   generate_upsetr_input(identity_ch.join(combine_roary_ilp.out[0]), strain_ids.out)
   upsetr(generate_upsetr_input.out[1])
+  if (params.sets) {upsetr_subset(generate_upsetr_input.out[1])}
 
   if (params.tree) {raxml(combine_msa.out)}
 }
@@ -172,6 +174,10 @@ def helpMSG() {
     --tree              build tree based on the core genome? 
                         Sure thing, We will use RAxML for this. 
                         Be aware, this will take a lot of time. [default: $params.tree]
+    --sets              FASTA simpleNames for genomes that should be 
+                        used in the UpSet plotting. Needed format:
+                        "\\"Cav\\",\\"Cab\\",\\"Cga\\",\\"Ctr\\"" [default: $params.sets]
+                        ${c_dim}(sorry, this will be simplified someday)${c_reset}
 
     ${c_yellow}Compute options:${c_reset}
     --cores             max cores for local use [default: $params.cores]
