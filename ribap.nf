@@ -181,10 +181,14 @@ def helpMSG() {
     --tree              build tree based on the core genome? 
                         Sure thing, We will use RAxML for this. 
                         Be aware, this will take a lot of time. [default: $params.tree]
+
+    ${c_yellow}UpSet plot:${c_reset}
     --sets              FASTA simpleNames for genomes that should be 
                         used in the UpSet plotting. Needed format:
                         "\\"Cav\\",\\"Cab\\",\\"Cga\\",\\"Ctr\\"" [default: $params.sets]
                         ${c_dim}(sorry, this will be simplified someday)${c_reset}
+    --heigth            Height of the plot [default: $params.height]
+    --width             Width of the plot [default: $params.width]
 
     ${c_yellow}Compute options:${c_reset}
     --cores             max cores for local use [default: $params.cores]
