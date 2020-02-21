@@ -14,7 +14,7 @@ process prokka {
 
   script:
     """
-      prokka --cpus ${task.cpus} --outdir output --prefix annotation ${fasta}
+      prokka --gcode ${params.gcode} --cpus ${task.cpus} --outdir output --prefix annotation ${fasta}
       mv output/annotation.faa ${name}.faa
       mv output/annotation.gff ${name}.gff
       mv output/annotation.gbk ${name}.gbk    
