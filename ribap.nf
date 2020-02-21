@@ -4,6 +4,7 @@ nextflow.preview.dsl=2
 /*
 Nextflow -- RIBAP
 Author: hoelzer.martin@gmail.com
+        kevin.lamkiewicz@uni-jena.de
 */
 
 /************************** 
@@ -58,25 +59,25 @@ if (params.fasta && params.list) { fasta_input_ch = Channel
 
 /* Comment section: */
 
-include './modules/rename' params(output: params.output)
-include './modules/prokka' params(output: params.output)
-include './modules/strain_ids' params(output: params.output)
-include './modules/roary' params(output: params.output)
-include './modules/mmseqs2' params(output: params.output)
-include './modules/blast2tsv' params(output: params.output)
-include './modules/ilp_build' params(output: params.output)
-include './modules/ilp_solve' params(output: params.output)
-include './modules/combine_roary_ilp' params(output: params.output)
-include './modules/prepare_msa' params(output: params.output)
-include './modules/mafft' params(output: params.output)
-include './modules/fasttree' params(output: params.output)
-include './modules/nw_display' params(output: params.output)
-include './modules/combine_msa' params(output: params.output)
-include './modules/generate_html' params(output: params.output)
-include './modules/generate_upsetr_input' params(output: params.output)
-include upsetr from './modules/upsetr' params(output: params.output)
-if (params.sets) {include upsetr_subset from './modules/upsetr' params(output: params.output, sets: params.sets)}
-if (params.tree) {include './modules/raxml' params(output: params.output)}
+include rename from './modules/rename' 
+include prokka from './modules/prokka' 
+include strain_ids from './modules/strain_ids' 
+include roary from './modules/roary' 
+include mmseqs2 from './modules/mmseqs2'
+include blast2tsv from './modules/blast2tsv'
+include ilp_build from './modules/ilp_build'
+include ilp_solve from './modules/ilp_solve' 
+include combine_roary_ilp from './modules/combine_roary_ilp'
+include prepare_msa from './modules/prepare_msa' 
+include mafft from './modules/mafft' 
+include fasttree from './modules/fasttree'
+include nw_display from './modules/nw_display' 
+include combine_msa from './modules/combine_msa'
+include generate_html from './modules/generate_html'
+include generate_upsetr_input from './modules/generate_upsetr_input' 
+include upsetr from './modules/upsetr' 
+if (params.sets) {include upsetr_subset from './modules/upsetr'}
+if (params.tree) {include raxml from './modules/raxml'}
 
 
 /************************** 
