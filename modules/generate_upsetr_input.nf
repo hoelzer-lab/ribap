@@ -2,7 +2,7 @@
 
 process generate_upsetr_input {
   label 'python3'
-  publishDir "${params.output}/upsetr", mode: 'copy', pattern: "gene_subsets.txt" 
+  publishDir "${params.output}/upsetr", mode: 'copy', pattern: "gene_subsets" 
   publishDir "${params.output}/upsetr", mode: 'copy', pattern: "*_subset.txt" 
 
   input:
@@ -10,7 +10,7 @@ process generate_upsetr_input {
     file(strain_ids)
 
   output:
-    file("gene_subsets.txt")
+    file("gene_subsets")
     file("*_subset.txt")
 
   script:
@@ -19,7 +19,7 @@ process generate_upsetr_input {
 
 input_file = '${holy_table}'
 input_strain_ids = '${strain_ids}'
-output_file = 'gene_subsets.txt'
+output_file = 'gene_subsets'
 
 with open(input_strain_ids) as file:
     strain_dict = {}
