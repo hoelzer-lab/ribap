@@ -25,7 +25,7 @@ process upsetr {
       sets <- sets[order(sapply(sets,length),decreasing=T)]
       svg(filename="upsetr.svg", 
           width=${params.width}, 
-          height=${params.height}, 
+          height=${params.heigth}, 
           pointsize=12)
       upset(fromList(sets), sets = names(sets),
           mainbar.y.label = "No. of common genes", sets.x.label = "No. of identified genes", 
@@ -64,7 +64,7 @@ process upsetr_subset {
       sets <- sets[order(sapply(sets,length),decreasing=T)]
       svg(filename="upsetr_subset.svg", 
           width=${params.width}, 
-          height=${params.height}, 
+          height=${params.heigth}, 
           pointsize=12)
       upset(fromList(sets), sets = c(${params.sets}),
           mainbar.y.label = "No. of common genes", sets.x.label = "No. of identified genes", 

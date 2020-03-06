@@ -187,7 +187,7 @@ def helpMSG() {
                         used in the UpSet plotting. Needed format:
                         "\\"Cav\\",\\"Cab\\",\\"Cga\\",\\"Ctr\\"" [default: $params.sets]
                         ${c_dim}(sorry, this will be simplified someday)${c_reset}
-    --heigth            Height of the plot [default: $params.height]
+    --heigth            Height of the plot [default: $params.heigth]
     --width             Width of the plot [default: $params.width]
 
     ${c_yellow}Compute options:${c_reset}
