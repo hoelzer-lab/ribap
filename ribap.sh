@@ -286,7 +286,7 @@ echo ''
 parallel -j "$CPUS" 'glpsol --lp {} --mipgap 0.01 --memlim 16834 --tmlim 120 -o {.}.sol >/dev/null' ::: "$OUTDIR"/ilp/*ilp 2>/dev/null
 
 function awk_parallel_magic {
-    awk '$2 ~ /x_A.*_B/ {print}' $1 > ${1%.*}.simple
+    awk '$2 ~ /x_A.*_B/ && $3 == 1 {print}' $1 > ${1%.*}.simple
 }
 export -f awk_parallel_magic
 parallel -j "$CPUS" 'awk_parallel_magic {}' ::: "$OUTDIR"/ilp/*sol 2>/dev/null

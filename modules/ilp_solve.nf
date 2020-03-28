@@ -14,7 +14,7 @@ process ilp_solve {
   script:
     """
     BN=\$(basename ${ilp} .ilp)
-    glpsol --lp \$BN.ilp --mipgap 0.01 --memlim 16834 --tmlim 120 -o \$BN.sol  
-    cat \$BN.sol | awk '\$2 ~ /x_A.*_B/ {print}' > \$BN.simple
+    glpsol --lp \$BN.ilp --mipgap 0.01 --memlim 16834 --tmlim 7200 -o \$BN.sol  
+    cat \$BN.sol | awk '\$2 ~ /x_A.*_B/{print}' > \$BN.simple
     """
 }
