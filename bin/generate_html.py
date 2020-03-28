@@ -17,8 +17,7 @@ import glob
 
 
 projectDir = sys.argv[1]
-#ribapFile = f'{projectDir}/holy_python_ribap_95.csv'
-ribapFile = f'holy_python_ribap_95.csv'
+ribapFile = f'{projectDir}/holy_python_ribap_95.csv'
 ribapHash = defaultdict(list)
 
 column2strain = {}
@@ -48,8 +47,7 @@ with open(ribapFile, 'r') as inputStream:
             geneTable[strain] = geneID
         ribapHash[ribapGroup] = [geneName, geneDesc, geneTable]
 
-#individualAnnotation = f'{projectDir}/ribap_individual_annotation.csv'
-individualAnnotation = f'ribap_individual_annotation.csv'
+individualAnnotation = f'{projectDir}/ribap_individual_annotation.csv'
 individualHash = defaultdict(dict)
 
 with open(individualAnnotation, 'r') as inputStream:
@@ -73,8 +71,7 @@ POS = list(range(14,14+NUMSTRAINS))
 
 IDENT = []
 roaryCluster = {}
-#for roaryFile in glob.glob(f'{projectDir}/roary/*/gene_presence_absence.csv'):
-for roaryFile in glob.glob(f'{projectDir}/*/gene_presence_absence.csv'):
+for roaryFile in glob.glob(f'{projectDir}/roary/*/gene_presence_absence.csv'):
     paralogs = []
     roarySim = os.path.basename(os.path.dirname(roaryFile))
     roaryCluster[roarySim] = {}
@@ -235,8 +232,7 @@ for group, content in ribapHash.items():
         tree = ""
     else:
         #tree =f"<img src={projectDir}/tree/{group}_mafft_tree.svg>"
-        #tree =f"<img src=../tree/{group}_mafft_tree.svg>"
-        tree =f"<img src=tree/{group}_tree.svg>"
+        tree =f"<img src=../tree/{group}_mafft_tree.svg>"
 
 
     HTMLBODY += '<tr data-child-value="<th>Strain</th><th>Gene Name</th><th>Gene Description</th><th>Roary 60</th><th>Roary 70</th><th>Roary 80</th><th>Roary 90</th><th>Roary 95</th><th>Phylogenetic Tree</th>'
@@ -245,8 +241,7 @@ for group, content in ribapHash.items():
         if individualAnno.split(" // ")[0] == '--' and individualAnno.split(" // ")[1] == "NA":
             continue
         if i == 0:
-#            HTMLBODY += f'<tr><td>{strain}</td><td>{individualAnno.split(" // ")[0]}</td><td>{individualAnno.split(" // ")[1]}</td>\n<td bgcolor=\'rgb{sampledColors60[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors70[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors80[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors90[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors95[content[2][strain]]}\'> </td>\n<td rowspan=\'{len(individualHash[group].keys())}\'>{tree}<p align=\'center\'><a href=\'../msa/{group}_mafft.aln\'>Multiple Sequence Alignment</a><br><a href=\'../msa/{group}_mafft_tree.nwk\'>Newick Tree</a></p></td></tr>\n'
-            HTMLBODY += f'<tr><td>{strain}</td><td>{individualAnno.split(" // ")[0]}</td><td>{individualAnno.split(" // ")[1]}</td>\n<td bgcolor=\'rgb{sampledColors60[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors70[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors80[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors90[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors95[content[2][strain]]}\'> </td>\n<td rowspan=\'{len(individualHash[group].keys())}\'>{tree}<p align=\'center\'><a href=\'../mafft/{group}_mafft.aln\'>Multiple Sequence Alignment</a><br><a href=\'../fasttree/{group}_tree.nwk\'>Newick Tree</a></p></td></tr>\n'
+            HTMLBODY += f'<tr><td>{strain}</td><td>{individualAnno.split(" // ")[0]}</td><td>{individualAnno.split(" // ")[1]}</td>\n<td bgcolor=\'rgb{sampledColors60[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors70[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors80[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors90[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors95[content[2][strain]]}\'> </td>\n<td rowspan=\'{len(individualHash[group].keys())}\'>{tree}<p align=\'center\'><a href=\'../msa/{group}_mafft.aln\'>Multiple Sequence Alignment</a><br><a href=\'../msa/{group}_mafft_tree.nwk\'>Newick Tree</a></p></td></tr>\n'
             i += 1
         else:
             HTMLBODY += f'<tr><td>{strain}</td><td>{individualAnno.split(" // ")[0]}</td><td>{individualAnno.split(" // ")[1]}</td><td bgcolor=\'rgb{sampledColors60[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors70[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors80[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors90[content[2][strain]]}\'> </td><td bgcolor=\'rgb{sampledColors95[content[2][strain]]}\'> </td></tr>\n'

@@ -148,8 +148,7 @@ def read_prokka_annotions(path):
     regexAnno = re.compile(r'product=(.*)')
     regexName = re.compile(r'Name=(\w*);?')
     regexID = re.compile(r'ID=(\w{8}_\d{5})')
-    #annoFiles = [x for x in glob.glob(f"{path}/../prokka/*/*.gff")]
-    annoFiles = [x for x in glob.glob(f"*.gff")]
+    annoFiles = [x for x in glob.glob(f"{path}/../prokka/*/*.gff")]
 
     geneAnnotations = {}
     geneNames = {}
@@ -351,10 +350,9 @@ def remove_duplicated_groups(assignedGroups):
     assignedGroups = {groupID : content for groupID, content in assignedGroups.items() if groupID not in groupsToDelete}
     return assignedGroups
 
-def write_output(outputFile, ident):
+def write_output(outputFile):
     sortedStrainIDs = []
- #   annoTable = os.path.dirname(outputFile) + "/ribap_individual_annotation.csv"
-    annoTable = "ribap_individual_annotation" + ident + ".csv"
+    annoTable = os.path.dirname(outputFile) + "/ribap_individual_annotation.csv"
 
     for roaryInputStrain in strainsRoary:
         sortedStrainIDs.append(strain2id[roaryInputStrain])
@@ -368,8 +366,6 @@ def write_output(outputFile, ident):
             for group, geneArray in assignedGroups.items():
                 if not geneArray:
                     continue
-                print(geneArray)
-                print(geneAnnotations)
                 annotations = [geneAnnotations[x] for x in geneArray]
                 names = [geneNames[x] for x in geneArray]
                 
@@ -436,7 +432,7 @@ assignedGroups = dict(sorted(list(assignedGroups.items()), key=lambda x: float(x
 assignedGroups = remove_duplicated_groups(assignedGroups)
 
 #
-write_output(sys.argv[4], sys.argv[5])
+write_output(sys.argv[4])
 
 ##########################################
 coreGeneCounter = 0
