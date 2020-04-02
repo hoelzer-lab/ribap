@@ -102,13 +102,11 @@ def read_pairwise_ILPs(ilpPath):
         comparison2 = f"{strain2}:{strain1}"
         ilps[comparison1] = {}
         ilps[comparison2] = {}
-    
+        print(ilp)
         geneRelations = {}
         with open(ilp, 'r') as inputStream:
-            while 1:
-                currentLine = inputStream.readline().rstrip("\n")
-                if not currentLine:
-                    break
+            for line in inputStream:
+                currentLine = line.rstrip("\n")
                 # store the ILP edge (x_A1_B1) in geneRelation
                 geneRelation = currentLine.split()[1]
                 # extract gene numbers from relation
@@ -124,6 +122,7 @@ def read_pairwise_ILPs(ilpPath):
                 if not headInA.endswith('h'):
                     continue
                 tailInA = headInA.replace('h','t')
+                if tailInA == headInA.replace('h','t'): continue
                 relationTails = geneRelations[tailInA]
 
                 # weird parsing stuff

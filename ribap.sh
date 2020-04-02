@@ -366,6 +366,9 @@ fi
 rm "$OUTDIR"/msa/*faa
 mkdir -p "$OUTDIR"/web
 mkdir -p "$OUTDIR"/tree
+wget https://www.rna.uni-jena.de/supplements/ribap/web.tar.gz
+tar zxvf web.tar.gz
+gunzip -r web
 cp -r "$DIR"/web/* "$OUTDIR"/web
 cp "$OUTDIR"/msa/*svg "$OUTDIR"/tree
 
