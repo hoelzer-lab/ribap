@@ -249,7 +249,7 @@ fi
 
 mkdir -p "$OUTDIR"/tsv
 ulimit -n 4096
-$DIR/scripts/blast2tsv.py "$MMSEQ" "$STRAIN_IDS" "$OUTDIR"/tsv
+$DIR/bin/blast2tsv.py "$MMSEQ" "$STRAIN_IDS" "$OUTDIR"/tsv
 ulimit -n 1024
 mkdir -p "$OUTDIR"/ilp
 #pairwise ILP comparison
@@ -262,7 +262,7 @@ echo 'PMID: 25859276'
 echo '---------------------------------'
 echo ''
 
-parallel -j "$CPUS" ''"$DIR"'/scripts/ILP.py --max --indel {} > '"$OUTDIR"'/ilp/{/.}.ilp 2>/dev/null' ::: "$OUTDIR"/tsv/*tsv 2>/dev/null
+parallel -j "$CPUS" ''"$DIR"'/bin/ILP.py --max --indel {} > '"$OUTDIR"'/ilp/{/.}.ilp 2>/dev/null' ::: "$OUTDIR"/tsv/*tsv 2>/dev/null
 
 if [ "$VERBOSE" ]; then
     log_message 'ILPs are prepared. Solving all of them might'
@@ -283,13 +283,28 @@ echo 'ILPs are solved using the freely-available ILP solver GLPK.'
 #echo 'of the GNU General Public License version 3 or later.'
 echo ''
 
-parallel -j "$CPUS" 'glpsol --lp {} --mipgap 0.01 --memlim 16834 --tmlim 120 -o {.}.sol >/dev/null' ::: "$OUTDIR"/ilp/*ilp 2>/dev/null
+#parallel -j "$CPUS" 'glpsol --lp {} --mipgap 0.01 --memlim 16834 --tmlim 120 -o {.}.sol >/dev/null' ::: "$OUTDIR"/ilp/*ilp 2>/dev/null
 
-function awk_parallel_magic {
-    awk '$2 ~ /x_A.*_B/ {print}' $1 > ${1%.*}.simple
-}
-export -f awk_parallel_magic
-parallel -j "$CPUS" 'awk_parallel_magic {}' ::: "$OUTDIR"/ilp/*sol 2>/dev/null
+
+# hardcoded stuff is hardcoded
+CPLEX="/data/prostlocal/CPLEX_Studio128/cplex/bin/x86-64_linux/cplex"
+for ILP in "$OUTDIR"/ilp/*ilp; do
+    "$CPLEX" -c "read $ILP" "lp" "set timelimit 3600" "set mip tolerances mipgap 0.01" "set threads $CPUS" "set workmem 16384" "opt" "set output writelevel 3" "write ${ILP%.*}.sol" "y" "quit" 2>/dev/null
+done
+
+for SOL in "$OUTDIR"/ilp/*sol; do
+    python3 "$DIR"/bin/cplexsol_to_simple.py "$SOL"
+done
+
+for SIMPLE in "$OUTDIR"/ilp/*simple.1; do
+    grep -E '^x_' "$SIMPLE" > "${SIMPLE%.*}"
+done
+
+#function awk_parallel_magic {
+#    awk '$2 ~ /x_A.*_B/ {print}' $1 > ${1%.*}.simple
+#}
+#export -f awk_parallel_magic
+#parallel -j "$CPUS" 'awk_parallel_magic {}' ::: "$OUTDIR"/ilp/*sol 2>/dev/null
 
 if [ "$VERBOSE" ]; then
     log_message 'ILPs are solved.'
@@ -299,7 +314,7 @@ if [ "$VERBOSE" ]; then
 fi
 
 for IDENT in 60 70 80 90 95; do
-    python3 "$DIR"/scripts/combine_roary_ilp.py "$OUTDIR"/strain_ids.txt "$OUTDIR"/roary/"$IDENT"/gene_presence_absence.csv "$OUTDIR"/ilp/ "$OUTDIR"/holy_python_ribap_"$IDENT".csv > "$OUTDIR"/ribap_roary"$IDENT"_summary.txt
+    python3 "$DIR"/bin/combine_roary_ilp.py "$OUTDIR"/strain_ids.txt "$OUTDIR"/roary/"$IDENT"/gene_presence_absence.csv "$OUTDIR"/ilp/ "$OUTDIR"/holy_python_ribap_"$IDENT".csv > "$OUTDIR"/ribap_roary"$IDENT"_summary.txt
 done
 
 if [ "$VERBOSE" ]; then
@@ -310,7 +325,7 @@ if [ "$VERBOSE" ]; then
 fi
 
 mkdir -p "$OUTDIR"/msa
-python3 "$DIR"/scripts/create_msa_tree.py "$OUTDIR" "$OUTDIR"/holy_python_ribap_95.csv
+python3 "$DIR"/bin/create_msa_tree.py "$OUTDIR" "$OUTDIR"/holy_python_ribap_95.csv
 
 #The Newick Utilities: High-throughput Phylogenetic tree Processing in the UNIX Shell
 #Thomas Junier and Evgeny M. Zdobnov
@@ -323,7 +338,7 @@ parallel -j "$CPUS" 'fasttree {} > {.}_tree.nwk 2>/dev/null' ::: "$OUTDIR"/msa/g
 parallel -j "$CPUS" 'nw_display -v 25 -i "font-size:6" -l "font-size:12;font-family:helvetica;font-style:italic" -Il -w 750 -b "opacity:0" -s {} > {.}.svg 2>/dev/null' ::: "$OUTDIR"/msa/*nwk 2>/dev/null
 #parallel -j "$CPUS" 'nw_display {} > {.}.ascii' ::: "$OUTDIR"/msa/*nwk
 
-python3 "$DIR"/scripts/concat_coreMSA.py "$OUTDIR"/msa "$NUMSTRAINS"
+python3 "$DIR"/bin/concat_coreMSA.py "$OUTDIR"/msa "$NUMSTRAINS"
 
 mkdir -p "$OUTDIR"/coreGenome/
 mv "$OUTDIR"/msa/coreGenome_mafft.aln "$OUTDIR"/coreGenome/
@@ -356,7 +371,7 @@ if [ "$VERBOSE" ]; then
     echo ''
 fi
 
-python3 "$DIR"/scripts/generate_html.py "$OUTDIR" > "$OUTDIR"/web/ribap.html
+python3 "$DIR"/bin/generate_html.py "$OUTDIR" > "$OUTDIR"/web/ribap.html
 cd "$OUTDIR"/
 ln -s web/ribap.html .
 
