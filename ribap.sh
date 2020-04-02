@@ -224,6 +224,8 @@ ALL="$OUTDIR"/mmseq2/all_proteins.fa
 cat "$OUTDIR"/prokka/*/*.faa > "$ALL"
 MMSEQDB="$OUTDIR"/mmseq2/mmseq2.db
 
+MMDIR=/home/co68mol/miniconda3/envs/mmseq
+PATH=$PATH:/home/co68mol/miniconda3/envs/mmseq/bin/
 
 #makeblastdb -in "$ALL" -dbtype prot -parse_seqids >/dev/null
 #blastp -task blastp -num_threads "$CPUS" -query "$ALL" -db "$ALL" -evalue 1e-10 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend qlen sstart send evalue bitscore slen" | awk '{if($3>60 && $4>($9*0.4)){print $0}}' > "$OUTDIR"/blast/all_vs_all.blast 2>/dev/null
@@ -262,7 +264,7 @@ echo 'PMID: 25859276'
 echo '---------------------------------'
 echo ''
 
-parallel -j "$CPUS" ''"$DIR"'/bin/ILP.py --max --indel {} > '"$OUTDIR"'/ilp/{/.}.ilp 2>/dev/null' ::: "$OUTDIR"/tsv/*tsv 2>/dev/null
+parallel -j "$CPUS" ''"$DIR"'/bin/ILP.py --max --indel {} > '"$OUTDIR"'/ilp/{/.}.ilp' ::: "$OUTDIR"/tsv/*tsv 2>/dev/null
 
 if [ "$VERBOSE" ]; then
     log_message 'ILPs are prepared. Solving all of them might'
@@ -297,7 +299,8 @@ for SOL in "$OUTDIR"/ilp/*sol; do
 done
 
 for SIMPLE in "$OUTDIR"/ilp/*simple.1; do
-    grep -E '^x_' "$SIMPLE" > "${SIMPLE%.*}"
+    #grep -E '^x_' "$SIMPLE" > "${SIMPLE%.*}"
+    awk '/^x_/ {print $2,$1}' "$SIMPLE" > "${SIMPLE%.*}"
 done
 
 #function awk_parallel_magic {
