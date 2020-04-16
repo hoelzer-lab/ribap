@@ -122,14 +122,18 @@ def read_pairwise_ILPs(ilpPath):
                 if not headInA.endswith('h'):
                     continue
                 tailInA = headInA.replace('h','t')
-                if tailInA == headInA.replace('h','t'): continue
+                if tailInA == geneRelations[headInA].split('_')[2]:
+                    continue
                 relationTails = geneRelations[tailInA]
 
                 # weird parsing stuff
                 headGene1 = relationHeads.split('_')[1].replace('h','').replace('A', f"{strain1}_")
-                headGene2 = relationHeads.split('_')[2].split('h')[0].replace('B', f"{strain2}_")
+                headGene2 = relationHeads.split('_')[2].replace('h','').replace('B', f"{strain2}_")
+                #headGene2 = relationHeads.split('_')[2].split('h')[0].replace('B', f"{strain2}_")
                 tailGene1 = relationTails.split('_')[1].replace('t','').replace('A', f"{strain1}_")
-                tailGene2 = relationTails.split('_')[2].split('t')[0].replace('B', f"{strain2}_")
+                tailGene2 = relationTails.split('_')[2].replace('t','').replace('B', f"{strain2}_")
+                #tailGene2 = relationTails.split('_')[2].split('t')[0].replace('B', f"{strain2}_")
+
                 # call adjust_length for be consistent with Prokka gene ID
                 headGene1 = adjust_length(headGene1)
                 headGene2 = adjust_length(headGene2)

@@ -251,7 +251,7 @@ fi
 
 mkdir -p "$OUTDIR"/tsv
 ulimit -n 4096
-$DIR/bin/blast2tsv.py "$MMSEQ" "$STRAIN_IDS" "$OUTDIR"/tsv
+"$DIR"/bin/blast2tsv.py "$MMSEQ" "$STRAIN_IDS" "$OUTDIR"/tsv
 ulimit -n 1024
 mkdir -p "$OUTDIR"/ilp
 #pairwise ILP comparison
@@ -289,7 +289,7 @@ echo ''
 
 
 # hardcoded stuff is hardcoded
-CPLEX="/data/prostlocal/CPLEX_Studio128/cplex/bin/x86-64_linux/cplex"
+CPLEX="/home/kevin/program/CPLEX_Studio128/cplex/bin/x86-64_linux/cplex"
 for ILP in "$OUTDIR"/ilp/*ilp; do
     "$CPLEX" -c "read $ILP" "lp" "set timelimit 3600" "set mip tolerances mipgap 0.01" "set threads $CPUS" "set workmem 16384" "opt" "set output writelevel 3" "write ${ILP%.*}.sol" "y" "quit" 2>/dev/null
 done
