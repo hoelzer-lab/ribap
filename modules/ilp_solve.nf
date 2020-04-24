@@ -6,7 +6,7 @@ process ilp_solve {
   publishDir "${params.output}/ilp/solved", mode: 'copy', pattern: "*simple" 
 
   input: 
-    file(ilp)
+    path(ilp)
 
   output:
     tuple file("*sol"), file("*simple")
