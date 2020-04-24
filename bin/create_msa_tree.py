@@ -25,7 +25,7 @@ id2strain = {}
 aminoSequences = {}
 NUMSTRAINS = 0
 #for file in glob.glob(f"{dirPath}/prokka/*/*faa"):
-for file in glob.glob(f"*.faa"):
+for file in glob.glob("**/*.faa"):
   NUMSTRAINS += 1
   basename = os.path.basename(file)
   for record in SeqIO.parse(file, 'fasta'):

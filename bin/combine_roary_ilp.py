@@ -152,7 +152,7 @@ def read_prokka_annotions(path):
     regexName = re.compile(r'Name=(\w*);?')
     regexID = re.compile(r'ID=(\w{8}_\d{5})')
     #annoFiles = [x for x in glob.glob(f"{path}/../prokka/*/*.gff")]
-    annoFiles = [x for x in glob.glob(f"*.gff")]
+    annoFiles = [x for x in glob.glob("**/*.gff")]
 
     geneAnnotations = {}
     geneNames = {}
@@ -220,7 +220,6 @@ def create_ribap_groups():
                 for ribapName, ribapGroup in  assignedGroups.items():
                     if cl in ribapGroup:
                         assignedGroups[ribapName] = ribapGroup.union(clusters)
-                        # [1,1,1,3,4,5] --> {1,3,4,5}
                         clusterDone = True
                         break
 
@@ -228,7 +227,6 @@ def create_ribap_groups():
             if not clusterDone:
                 groupCounter += 1
                 assignedGroups[f'group{groupCounter}'] = set(clusters)
-
 
 def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCounter, subgroups={}):
     paralogForMainGroup = {}
