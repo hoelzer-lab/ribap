@@ -103,6 +103,14 @@ class FFProblem():
 
 class ILPGenerator():
 
+    def __init__(self, tsvFile):
+        
+        self.dirname = '/'.join(tsvFile.split('/')[:-2]) + "/ilp/"
+        self.basename = tsvFile.split('/')[-1].split('.')[0]
+        self.out = self.dirname+self.basename 
+        
+        
+        
     def atoi(self, text):
         return int(text) if text.isdigit() else text
 
@@ -197,10 +205,30 @@ class ILPGenerator():
         #print >> sys.stderr, "Fixed %d edges." % len(new_edges)
         return new_edges
 
+    def get_stream(self, u, components, streams):
+        for idx, component in components.items():
+            if u in component:
+                return streams[idx]
+
+    def broadcast_streams(self, streams, message):
+        for idx, stream in streams.items():
+            stream.write(message)
 
     def generate_lp(self, P, alpha=0.5, self_edge_cost=0, MATCHING_SIZE=False, MAXIMAL_MATCHING=False, tolerance=0, INDEL=False):
         G = P.G
+        outputStreams = {}
+        disjointComponents = {idx:c for idx,c in enumerate(connected_components(G)) if len(c)}
+        #component2Stream = {c : idx for idx,c in disjointComponents.items()}
+        #exit(0)
+        for idx, _ in disjointComponents.items():
+            stream = open(f"{self.out}_{idx}.ilp",'w')
+            outputStreams[idx] = stream
 
+        self.broadcast_streams(outputStreams, "Minimize\nobj: ")    
+        if not MATCHING_SIZE:
+            self.broadcast_streams(outputStreams, f"{(P.n1 + P.n2) / 2.0} g ")
+            
+        
         # Find K2 components, to fix edges:
         k2 = [c for c in connected_components(G) if len(c) == 2]
 
@@ -214,24 +242,26 @@ class ILPGenerator():
         constraintID = 1
         # objective function:
         #print >> sys.stderr, "Printing ILP ..."
-        print("Minimize")
-        print("obj:", end=' ')
-        if not MATCHING_SIZE:
+        #print("Minimize")
+        #print("obj:", end=' ')
+        #if not MATCHING_SIZE:
             # print P.n1 + P.n2, "g",
             #print(P.n1 + P.n2) / 2.0, "g",  # new alpha
-            print(f"{(P.n1 + P.n2) / 2.0} g", end=" ")  # new alpha
+        #    print(f"{(P.n1 + P.n2) / 2.0} g", end=" ")  # new alpha
             #print(f"{(P.n1 + P.n2) / 2.0}", end=" ")  # new alpha
 
             # Since the weight of "parallel edges" is the same, and I need to divide by 2, and also parallel edges are
         # forced to be together, I only include one of each in the OF (only edges[0] below)
         for u, v in G.edges():
+            stream = self.get_stream(u,disjointComponents,outputStreams)
             w = G[u][v]['weight']
             edges = self.weighted_edge_var(u, v, w)
             # edge_w = 2 - abs(w) if MATCHING_SIZE else -abs(w)
             edge_w = (1 if MATCHING_SIZE else 0) + (alpha - 1) * abs(w)
-            print("%+f %s" % (edge_w, edges[0]), end=" ")
+            stream.write(f"{edge_w} {edges[0]} ")
+            #print("%+f %s" % (edge_w, edges[0]), end=" ")
             #print(f"{edge_w} {edges[0]}", end=" ")
-
+        
         # 28.06.2016, Kevin:
         # Changed the self_edge_cost to alpha in order to implement the modification proposed
         # in Braga et al. 2011 - DCJ with Indels
@@ -245,44 +275,72 @@ class ILPGenerator():
                     # ignore k2 vertices, they are already fixed;
                     if u in k2_vertices:
                         continue
-                    print("%+.2f %s" % (self_edge_cost, self.edge_var(u, "t", u, "h")), end =" ")
+                    self.get_stream(u,disjointComponents,outputStreams)
                     #print(f"{self_edge_cost} {edge_var(u, "t", u, "h")}", end=" ")
+                    stream.write(f"+ {self_edge_cost} {self.edge_var(u, 't', u, 'h')} ")
+                    
+                    #print("%+.2f %s" % (self_edge_cost, self.edge_var(u, "t", u, "h")), end =" ")                    
 
         # print "-", " - ".join(["%.2f z_%s" % (cycle_weight, x) for x in
         # all_extremities_of_genome(P, 0) if x[-1] == 'h']),
-        print("-", " - ".join(["%.3f z_%s" % (alpha, x) for x in self.all_extremities_of_genome(P, 0) if x[-1] == 'h']), end=" ")
+        #print("-", " - ".join(["%.3f z_%s" % (alpha, x) for x in self.all_extremities_of_genome(P, 0) if x[-1] == 'h']), end=" ")
+        for x in self.all_extremities_of_genome(P,0):
+            if x[-1] == 'h':
+                stream = self.get_stream(x[:-1], disjointComponents, outputStreams)
+                stream.write(f"- {alpha} z_{x} ")
+        
         if INDEL:
-            print("+", " + ".join("%.3f b_%s" % (alpha, x) for x in sorted(G.nodes()) if x not in k2_vertices), end=" ")
-        print()
+            for x in sorted(G.nodes()):
+                if x not in k2_vertices:
+                    stream = self.get_stream(x, disjointComponents, outputStreams)
+                    stream.write(f"+ {alpha} b_{x} ")
+            #print("+", " + ".join("%.3f b_%s" % (alpha, x) for x in sorted(G.nodes()) if x not in k2_vertices), end=" ")
+        #print()
 
         # constraints:
-        print("Subject To")
+        self.broadcast_streams(outputStreams, "\nSubject To\n")
+        #for idx, stream in outputStreams.items():
+            #print("Subject To")
+        #    stream.write("\nSubject To\n")
 
         if not MATCHING_SIZE:
-            print(f"c{constraintID}: g = 1")
+            #print(f"c{constraintID}: g = 1")
+            self.broadcast_streams(outputStreams, f"c{constraintID}: g = 1\n")
+            #stream.write(f"c{constraintID} g = 1\n")
             constraintID += 1
 
-        # Consistency:
-        print("\ consistency (parallel edges)")
+            # Consistency:
+            #print("\ consistency (parallel edges)")
+            stream.write("\ consistency (parallel edges)\n")
+        
+
         for v, u in G.edges():
             w = G[v][u]['weight']
+            stream = self.get_stream(u, disjointComponents, outputStreams)
             if u in k2_vertices and v in k2_vertices:
                 for e in self.weighted_edge_var(u, v, w):
                     #print e, "= 1")
-                    print(f"c{constraintID}: {e} = 1")
+                    #print(f"c{constraintID}: {e} = 1")
+                    stream.write(f"c{constraintID}: {e} = 1\n")
                     constraintID += 1
             else:
-                print("c"+str(constraintID) + ": " + " - ".join(self.weighted_edge_var(u, v, w)), "= 0")
+                #print("c"+str(constraintID) + ": " + " - ".join(self.weighted_edge_var(u, v, w)), "= 0")
+                stream.write("c"+str(constraintID) + ": " + " - ".join(self.weighted_edge_var(u, v, w)) + "= 0\n")
                 constraintID += 1
-
+        
         # One edge per vertex:
-        print ("\ degree 1 for each vertex")
+        self.broadcast_streams(outputStreams, "\ degree 1 for each vertex\n")
+        #for idx, stream in outputStreams.items():
+        #    stream.write("\ degree 1 for each vertex\n")
+        #print ("\ degree 1 for each vertex")
+        
         for g in range(2):  # each genome
             for i in range(1, P.size(g) + 1):
                 u = GSGraph.node_name(i, g)
                 # ignore k2 vertices, they are already fixed;
                 if u in k2_vertices:
                     continue
+                stream = self.get_stream(u, disjointComponents, outputStreams)
                 nodes_h = []
                 nodes_t = []
                 for v in G.neighbors(u):
@@ -294,73 +352,90 @@ class ILPGenerator():
                 nodes_h.append(self.edge_var(u, "t", u, "h"))
                 # print "# %st" % u
                 #print(" + ".join(nodes_t), " = 1", "    \\", u + "t")
-                print("c"+str(constraintID) + ": "+" + ".join(nodes_t), " = 1")
+                #print("c"+str(constraintID) + ": "+" + ".join(nodes_t), " = 1")
+                stream.write("c"+str(constraintID) + ": "+" + ".join(nodes_t) + " = 1\n")
                 constraintID += 1
                 # print "# %sh" % u
-                print("c"+str(constraintID) + ": "+" + ".join(nodes_h), " = 1")
+                #print("c"+str(constraintID) + ": "+" + ".join(nodes_h), " = 1")
+                stream.write("c"+str(constraintID) + ": "+" + ".join(nodes_h) + " = 1\n")
                 constraintID += 1
 
         # Maximal matching:
         if MAXIMAL_MATCHING:
-            print("\ Maximal matching")
+            self.broadcast_streams(outputStreams, "\ Maximal matching\n")
+            #print("\ Maximal matching")
             for u, v in G.edges():
                 if u in k2_vertices:
                     continue
-                print("c"+str(constraintID) + ": " + "%s + %s <= 1" % (self.edge_var(u, "t", u, "h"), self.edge_var(v, "t", v, "h")))
+                stream = self.get_stream(u, disjointComponents, outputStreams)
+                #print("c"+str(constraintID) + ": " + "%s + %s <= 1" % (self.edge_var(u, "t", u, "h"), self.edge_var(v, "t", v, "h")))
+                stream.write("c"+str(constraintID) + ": " + "%s + %s <= 1\n" % (self.edge_var(u, "t", u, "h"), self.edge_var(v, "t", v, "h")))
                 constraintID += 1
-
+        
         # Adjacent vertices, same label:
         m = (P.n1 + P.n2) * 2
-        print("\ Label - adj vertices with same label")
+        #print("\ Label - adj vertices with same label")
+        self.broadcast_streams(outputStreams, "\ Label - adj vertices with same label\n")
         # matching edges:
         for u, v in G.edges():
+            stream = self.get_stream(u, disjointComponents, outputStreams)
             edges = self.weighted_edge_var(u, v, G[u][v]['weight'])
             for i in [0, 1]:
                 x, v1, v2 = edges[i].split("_")
                 # print
                 if u in k2_vertices:
-                    print(f"c{constraintID}: y_{v1} - y_{v2} = 0")
+                    #print(f"c{constraintID}: y_{v1} - y_{v2} = 0")
+                    stream.write(f"c{constraintID}: y_{v1} - y_{v2} = 0\n")
                     constraintID += 1
                 else:
                     #print("y_%s - y_%s  + %d %s <= %d" % (v1, v2, m, edges[i], m))
-                    print(f"c{constraintID}: y_{v1} - y_{v2}  + {m} {edges[i]} <= {m}")
+                    #print(f"c{constraintID}: y_{v1} - y_{v2}  + {m} {edges[i]} <= {m}")
+                    stream.write(f"c{constraintID}: y_{v1} - y_{v2}  + {m} {edges[i]} <= {m}\n")
                     constraintID += 1
                     #print("y_%s - y_%s  + %d %s <= %d" % (v2, v1, m, edges[i], m))
-                    print(f"c{constraintID}: y_{v2} - y_{v1}  + {m} {edges[i]} <= {m}")
+                    #print(f"c{constraintID}: y_{v2} - y_{v1}  + {m} {edges[i]} <= {m}")
+                    stream.write(f"c{constraintID}: y_{v2} - y_{v1}  + {m} {edges[i]} <= {m}\n")
                     constraintID += 1
                     # self edges:
+        
         for g in range(2):
             for i in range(1, P.size(g) + 1):
                 u = GSGraph.node_name(i, g)
                 # k2 vertices do not have self edges:
                 if u in k2_vertices:
                     continue
+                stream = self.get_stream(u, disjointComponents, outputStreams)
                 #print("y_%sh - y_%st  + %d %s <= %d" % (u, u, m, self.edge_var(u, 'h', u, 't'), m), "\  Self edge for ", u)
                 #print("y_%sh - y_%st  + %d %s <= %d" % (u, u, m, self.edge_var(u, 'h', u, 't'), m), "\  Self edge for ", u)
-                print(f"c{constraintID}: y_{u}h - y_{u}t  + {m} {self.edge_var(u, 'h', u, 't')} <= {m}")
+                #print(f"c{constraintID}: y_{u}h - y_{u}t  + {m} {self.edge_var(u, 'h', u, 't')} <= {m}")
+                stream.write(f"c{constraintID}: y_{u}h - y_{u}t  + {m} {self.edge_var(u, 'h', u, 't')} <= {m}\n")
                 constraintID += 1
                 #print("y_%st - y_%sh  + %d %s <= %d" % (u, u, m, self.edge_var(u, 'h', u, 't'), m))
-                print(f"c{constraintID}: y_{u}t - y_{u}h  + {m} {self.edge_var(u, 'h', u, 't')} <= {m}")
+                #print(f"c{constraintID}: y_{u}t - y_{u}h  + {m} {self.edge_var(u, 'h', u, 't')} <= {m}")
+                stream.write(f"c{constraintID}: y_{u}t - y_{u}h  + {m} {self.edge_var(u, 'h', u, 't')} <= {m}\n")
                 constraintID += 1
                 #        nodes_t.append(edge_var(u, "t", u, "h"))
 
         # adjacency edges:
-        print()
+        #print()
         for g in range(2):
             for i in range(1, P.size(g)):
                 #print("y_%s - y_%s = 0" % (GSGraph.node_name(i, g) + "h", GSGraph.node_name(i + 1, g) + "t"))
-                print("c"+str(constraintID)+": " + "y_%s - y_%s = 0" % (GSGraph.node_name(i, g) + "h", GSGraph.node_name(i + 1, g) + "t"))
+                #print("c"+str(constraintID)+": " + "y_%s - y_%s = 0" % (GSGraph.node_name(i, g) + "h", GSGraph.node_name(i + 1, g) + "t"))
+                self.broadcast_streams(outputStreams, "c"+str(constraintID)+": " + "y_%s - y_%s = 0\n" % (GSGraph.node_name(i, g) + "h", GSGraph.node_name(i + 1, g) + "t"))
                 constraintID += 1
                 # Assuming circular genome:
             #print("y_%s - y_%s = 0" % (GSGraph.node_name(P.size(g), g) + "h", GSGraph.node_name(1, g) + "t"))
-            print("c"+str(constraintID)+": " + "y_%s - y_%s = 0" % (GSGraph.node_name(P.size(g), g) + "h", GSGraph.node_name(1, g) + "t"))
+            self.broadcast_streams(outputStreams, "c"+str(constraintID)+": " + "y_%s - y_%s = 0\n" % (GSGraph.node_name(P.size(g), g) + "h", GSGraph.node_name(1, g) + "t"))
+            #print("c"+str(constraintID)+": " + "y_%s - y_%s = 0" % (GSGraph.node_name(P.size(g), g) + "h", GSGraph.node_name(1, g) + "t"))
             constraintID += 1
 
         # cycle counter:
         for c, e in enumerate(self.all_extremities_of_genome(P, 0)):
             if e[-1] == 't':
                 continue
-            print("c"+str(constraintID)+": " + "%d z_%s - y_%s <= 0" % (c + 1, e, e))
+            self.broadcast_streams(outputStreams, "c"+str(constraintID)+": " + "%d z_%s - y_%s <= 0\n" % (c + 1, e, e))
+            #print("c"+str(constraintID)+": " + "%d z_%s - y_%s <= 0" % (c + 1, e, e))
             constraintID += 1
 
         ##################
@@ -377,49 +452,63 @@ class ILPGenerator():
                         else:
                             nextGene = GSGraph.node_name(i + 1, g)
                         if not nextGene in k2_vertices:
-                            print("c"+str(constraintID)+": " + "%s - %s - b_%s <= 0" % (self.edge_var(currentGene, 'h', currentGene, 't'), self.edge_var(nextGene, 'h', nextGene, 't'), currentGene))
+                            self.broadcast_streams(outputStreams, "c"+str(constraintID)+": " + "%s - %s - b_%s <= 0\n" % (self.edge_var(currentGene, 'h', currentGene, 't'), self.edge_var(nextGene, 'h', nextGene, 't'), currentGene))
+                            #print("c"+str(constraintID)+": " + "%s - %s - b_%s <= 0" % (self.edge_var(currentGene, 'h', currentGene, 't'), self.edge_var(nextGene, 'h', nextGene, 't'), currentGene))
                             constraintID += 1
                         else:
-                            print("c"+str(constraintID)+": " + "%s - b_%s = 0" % (self.edge_var(currentGene, 'h', currentGene, 't'), currentGene))
+                            self.broadcast_streams(outputStreams, "c"+str(constraintID)+": " + "%s - b_%s = 0\n" % (self.edge_var(currentGene, 'h', currentGene, 't'), currentGene))
+                            #print("c"+str(constraintID)+": " + "%s - b_%s = 0" % (self.edge_var(currentGene, 'h', currentGene, 't'), currentGene))
                             constraintID += 1
-                print()
+                
 
         # Bounds:
-        print()
-        print("Bounds")
+        self.broadcast_streams(outputStreams, "\nBounds\n")
+        #print()
+        #print("Bounds")
         # Node labels:
         c = 1
         for e in self.all_extremities(P):
-            print("y_%s <= %d" % (e, c))
+            self.broadcast_streams(outputStreams, "y_%s <= %d\n" % (e, c))
+            #print("y_%s <= %d" % (e, c))
             c += 1
-        print()
+        #print()
         # Variable types:
-        print("Binary")
+        #print("Binary")
+        self.broadcast_streams(outputStreams, "\nBinary\n")
         # matching edges
         for u, v in G.edges():
+            stream = self.get_stream(u, disjointComponents, outputStreams)
             w = G[u][v]['weight']
             edges = self.weighted_edge_var(u, v, w)
-            print("\n".join(edges))
+            #print("\n".join(edges))
+            stream.write("\n".join(edges)+"\n")
             # self edges:
+
         for g in range(2):
             for i in range(1, P.size(g) + 1):
                 u = GSGraph.node_name(i, g)
                 # k2 vertices do not have self edges:
                 if u in k2_vertices:
                     continue
-                print(self.edge_var(u, 'h', u, 't'))
+                stream = self.get_stream(u, disjointComponents, outputStreams)
+                #print(self.edge_var(u, 'h', u, 't'))
+                stream.write(self.edge_var(u, 'h', u, 't')+"\n")
             # z_ : cycle counters (only vertices in A of type 'head')
-        print("\n".join("z_" + x for x in self.all_extremities_of_genome(P, 0) if x[-1] == 'h'))
-        print()
+
+        self.broadcast_streams(outputStreams, "\n".join("z_" + x for x in self.all_extremities_of_genome(P, 0) if x[-1] == 'h'))
+        #print("\n".join("z_" + x for x in self.all_extremities_of_genome(P, 0) if x[-1] == 'h'))
+        #print()
         if INDEL:
-            print("\n".join("b_" + x for x in sorted(G.nodes()) if x not in k2_vertices))
+            self.broadcast_streams(outputStreams, "\n"+"\n".join("b_" + x for x in sorted(G.nodes()) if x not in k2_vertices))
+            #print("\n".join("b_" + x for x in sorted(G.nodes()) if x not in k2_vertices))
         #if not MATCHING_SIZE:
         #    print("g")
-        print("General")
-        print("\n".join("y_" + x for x in self.all_extremities(P)))
-        print
+        self.broadcast_streams(outputStreams, "\nGeneral\n"+"\n".join("y_" + x for x in self.all_extremities(P))+"\nEnd\n")
+        #print("General")
+        #print("\n".join("y_" + x for x in self.all_extremities(P)))
+        #print
         # print "\n".join("k_" + x for x in sorted(GSGraph.nodes(G)) if x not in k2_vertices)
-        print("End")
+        #print("End")
 
 
 def parse_arguments(param):
@@ -451,6 +540,6 @@ if __name__ == '__main__':
 
     # print ILP:
     #print >> sys.stderr, "Generating ILP..."
-    ilpGen = ILPGenerator()
+    ilpGen = ILPGenerator(tsvFile)
     ilpGen.generate_lp(P, self_edge_cost=s, alpha=alpha, MATCHING_SIZE=matching_size,
                 MAXIMAL_MATCHING=maximal, tolerance=fix_adj_tolerance, INDEL=indel)

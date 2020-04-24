@@ -105,7 +105,11 @@ def read_pairwise_ILPs(ilpPath):
         comparison2 = f"{strain2}:{strain1}"
         ilps[comparison1] = {}
         ilps[comparison2] = {}
+<<<<<<< HEAD
 
+=======
+        #print(ilp)
+>>>>>>> cplex_test
         geneRelations = {}
         with open(ilp, 'r') as inputStream:
             for line in inputStream:
@@ -131,14 +135,19 @@ def read_pairwise_ILPs(ilpPath):
                     continue
 
                 tailInA = headInA.replace('h','t')
+                if tailInA == geneRelations[headInA].split('_')[2]:
+                    continue
                 relationTails = geneRelations[tailInA]
 
                 # weird parsing stuff;  x_A456h_B458h --> DCKEFHG_456 and TYQFDEEW_458
                 # map ILP syntax back to Prokka gene IDs
                 headGene1 = relationHeads.split('_')[1].replace('h','').replace('A', f"{strain1}_")
-                headGene2 = relationHeads.split('_')[2].split('h')[0].replace('B', f"{strain2}_")
+                headGene2 = relationHeads.split('_')[2].replace('h','').replace('B', f"{strain2}_")
+                #headGene2 = relationHeads.split('_')[2].split('h')[0].replace('B', f"{strain2}_")
                 tailGene1 = relationTails.split('_')[1].replace('t','').replace('A', f"{strain1}_")
-                tailGene2 = relationTails.split('_')[2].split('t')[0].replace('B', f"{strain2}_")
+                tailGene2 = relationTails.split('_')[2].replace('t','').replace('B', f"{strain2}_")
+                #tailGene2 = relationTails.split('_')[2].split('t')[0].replace('B', f"{strain2}_")
+
                 # call adjust_length for be consistent with Prokka gene ID
                 # DCKEFHG_456 and TYQFDEEW_458 --> DCKEFHG_00456 and TYQFDEEW_00458
                 headGene1 = adjust_length(headGene1)
@@ -160,7 +169,7 @@ def read_prokka_annotions(path):
     regexName = re.compile(r'Name=(\w*);?')
     regexID = re.compile(r'ID=(\w{8}_\d{5})')
     #annoFiles = [x for x in glob.glob(f"{path}/../prokka/*/*.gff")]
-    annoFiles = [x for x in glob.glob(f"*.gff")]
+    annoFiles = [x for x in glob.glob("**/*.gff")]
 
     geneAnnotations = {}
     geneNames = {}
@@ -193,87 +202,46 @@ def create_ribap_groups():
     groupCounter = 0
     tmpGcounter = 0
 
-    # iterate genes and their respective roary clusters
-    # look for homologs based on ILPs
-    # usedClusters = set()
-    for gene, cluster in genes.items():
-        # get current strain from current gene; ABCDEFGH_00512 -> ABCDEFGH
-        strain = gene.split('_')[0]
-        # initialize clusters list with current only cluster
-        clusters = [cluster]
-        if gene == DEBUG_GENE:
-            print()
-            print("Looking at DEBUG GENE!: ", group, clusters)
-        # flag needed for consistent RIBAP group IDs
-        newGroup = True
-        for group, a in assignedGroups.items():
-            if cluster in a:
-                # if a roary cluster is already assigned to a RIBAP group
-                # dont do any magic, just store the current group ID.
-                newGroup = False
-                tmpGcounter = groupCounter
-                groupCounter = int(group.replace('group',''))
-                if gene == DEBUG_GENE:
-                    print("Whoops found an old group!:")
-                    print("Looking at DEBUG GENE!: ", group, clusters)
-                    print()
-                break
+    for cluster, geneList in cluster2gene.items():
+  
+        if any([cluster in ribapGroup for ribapName, ribapGroup in assignedGroups.items()]):
+            continue
 
-        if newGroup:
-            groupCounter += 1
-            # if there is a new group, initialize a RIBAP group with the 
-            # current roary cluster of our current gene
-            assignedGroups[f"group{groupCounter}"] = [cluster]
+        clusters = set([cluster])
 
-        # look into ILPs
-        for comparison, results_h in ilps.items():
-            strain1 = comparison.split(':')[0]
+        for gene in geneList:
+            strain = gene.split('_')[0]
+
+            for comparison, results_h in ilps.items():
+                strain1 = comparison.split(':')[0]
             # if the ILP comparison is with our current strain
-            if strain1 == strain:
+                if strain1 == strain:
                 # if in the current pairwise comparison
                 # our gene of interest has a hit with the second strain
-                if gene in results_h:
+                    if gene in results_h:
                     # then get the homologGene from the second strain (based on ILP)
-                    homologGene = results_h[gene]    
-                    if homologGene in genes:
-                        if homologGene == DEBUG_GENE:
-                            print(group, gene, homologGene, genes[gene], genes[homologGene])
+                        homologGene = results_h[gene]    
+                        if homologGene in genes:
                         # if the ILP-based homolog gene has a assigned roary cluster
                         # merge the clusters of the current gene and homolog gene into
                         # one RIBAP group
-                        clusters.append(genes[homologGene])
-        
-        clusters = sorted(clusters) #ToDo: why sort?
+                        # genes == gene2cluster
+                            clusters.add(genes[homologGene])
 
-        if newGroup:
-            for group, a in assignedGroups.items():
-                if group.endswith(str(groupCounter)):
-                    continue
-                if any([cl in a for cl in clusters]):
-                    #print(groupCounter, group)
-                    newGroup = False
-                    tmpGcounter = groupCounter - 1
-                    groupCounter = int(group.replace('group',''))
+            clusterDone = False
+            for cl in clusters:
+                if clusterDone: 
                     break
-        for cl in set(clusters):                
-            if not cl in clusterSizes.keys():
-                continue # does this actually happen?
-
-            # if our group has as many instances of a roary cluster
-            # as the roary cluster has genes, we found a roary cluster
-            # that can be merged with another into a group
-            # len(Group with instances of cluster X) == len(actual list of genes of cluster X)
-            if clusters.count(cl) == clusterSizes[cl]:
-                # just include the cluster, if it hasn't been before (e.g. from a previous gene)
-                if cl != cluster and not cl in assignedGroups[f"group{groupCounter}"]:
-                    assignedGroups[f"group{groupCounter}"].append(cl)
-                    if cl == genes[DEBUG_GENE]:
-                        print("Found my group!", groupCounter)
+                for ribapName, ribapGroup in  assignedGroups.items():
+                    if cl in ribapGroup:
+                        assignedGroups[ribapName] = ribapGroup.union(clusters)
+                        clusterDone = True
+                        break
 
 
-        if not newGroup:
-            groupCounter = tmpGcounter    
-
+            if not clusterDone:
+                groupCounter += 1
+                assignedGroups[f'group{groupCounter}'] = set(clusters)
 
 def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCounter, subgroups={}):
     paralogForMainGroup = {}
@@ -316,7 +284,7 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
             print(strain2paralogs)
             exit(0)
     
-    subgroupGenes = [y for x in strain2paralogs.values() for y in x]
+    subgroupGenes = set([y for x in strain2paralogs.values() for y in x])
     subgroups.update({f"{groupID}.{subgroupCounter}" : subgroupGenes})
 
     for subID, paralogsInSub in subgroups.items():            
@@ -341,9 +309,9 @@ def fill_group_with_genes():
     """
     subgroups = {}
     for group, clusterArray in assignedGroups.items():
-        #genesOfGroup = []
-        genesOfGroup = [x for cluster in clusterArray for x in cluster2gene[cluster]]
-        # overwrite list of cluster with list of genes
+        genesOfGroup = set([])
+        
+        genesOfGroup = set([x for cluster in clusterArray for x in cluster2gene[cluster]])
         assignedGroups[group] = genesOfGroup
         strainsInGroup = [x.split('_')[0] for x in genesOfGroup]
 
@@ -360,7 +328,7 @@ def fill_group_with_genes():
                     ilpSupport[paralogGene] = set()
                     for remainingGene in genesOfGroup:
                         if remainingGene.startswith(strain):
-                            continue
+                            continueglob
                         ilpComparison = f"{strain}:{remainingGene.split('_')[0]}"
                         # ilps[ilpComparison]: { strainA_geneID : strainB_geneID }
                         if paralogGene in ilps[ilpComparison]:
@@ -374,9 +342,11 @@ def fill_group_with_genes():
 def remove_duplicated_groups(assignedGroups):
     groups = sorted(assignedGroups, key=lambda x: len(assignedGroups[x]))
     groupsToDelete = set()
+
     for idx, groupID in enumerate(groups):
         for largerID in groups[idx+1:]:
-            if set(assignedGroups[groupID]).issubset(set(assignedGroups[largerID])):
+            if assignedGroups[groupID].intersection(assignedGroups[largerID]):
+                assignedGroups[largerID] = assignedGroups[groupID].union(assignedGroups[largerID])
                 groupsToDelete.add(groupID)
     assignedGroups = {groupID : content for groupID, content in assignedGroups.items() if groupID not in groupsToDelete}
     return assignedGroups
@@ -472,34 +442,12 @@ print()
 
 # create ribap groups based on roary and ILPs
 create_ribap_groups()
-for group, cluster in assignedGroups.items():
-    if genes[DEBUG_GENE] in cluster:
-        print(group)
-        print(cluster)
-print()
+assignedGroups = remove_duplicated_groups(assignedGroups)
 
 # assign genes to the roary clusters of each ribap group
 fill_group_with_genes()
-for group, cluster in assignedGroups.items():
-    if DEBUG_GENE in cluster:
-        print(group)
-        print(cluster)
-print()
-
 assignedGroups = dict(sorted(list(assignedGroups.items()), key=lambda x: float(x[0].replace("group",''))))
-for group, cluster in assignedGroups.items():
-    if DEBUG_GENE in cluster:
-        print(group)
-        print(cluster)
-print()
-# remove duplicated subgroups.
-assignedGroups = remove_duplicated_groups(assignedGroups)
-for group, cluster in assignedGroups.items():
-    if DEBUG_GENE in cluster:
-        print(group)
-        print(cluster)
-print()
-#
+
 write_output(sys.argv[4], sys.argv[5])
 
 ##########################################
