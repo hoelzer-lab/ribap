@@ -109,9 +109,11 @@ workflow {
   ilp_solve(
     ilp_build(
       blast2tsv(mmseqs2.out, strain_ids.out).flatten()
-    ).flatten()
+    )
   )
+
   
+
   //copy all *sol and *simple into a solved folder for ilp_solve
   combine_ch = identity_ch
     .join(roary.out)
@@ -120,9 +122,9 @@ workflow {
       .combine(strain_ids.out))
     .join(identity_ch
       .combine(gff_ch).groupTuple())
-  combine_roary_ilp(combine_ch, ilp_solve.out.flatten().toList())
-//    .join(identity_ch.combine(
-//      ilp_solve.out.flatten().toList())) 
+
+  combine_roary_ilp(combine_ch, ilp_solve.out.flatten().toList()) 
+/*
 
 
   // select only the 95 combined output file
@@ -147,6 +149,8 @@ workflow {
   if (params.sets) {upsetr_subset(generate_upsetr_input.out[1])}
 
   if (params.tree) {raxml(combine_msa.out)}
+
+*/
 }
 
 

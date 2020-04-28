@@ -105,11 +105,6 @@ def read_pairwise_ILPs(ilpPath):
         comparison2 = f"{strain2}:{strain1}"
         ilps[comparison1] = {}
         ilps[comparison2] = {}
-<<<<<<< HEAD
-
-=======
-        #print(ilp)
->>>>>>> cplex_test
         geneRelations = {}
         with open(ilp, 'r') as inputStream:
             for line in inputStream:

@@ -17,7 +17,7 @@ process combine_roary_ilp {
   script:
     """
     mkdir solved
-    cp *.sol *.simple solved/
+    cp simple_*/*.simple solved/
     combine_roary_ilp.py ${strain_ids} ${ident}/gene_presence_absence.csv solved/ holy_python_ribap_"${ident}".csv ${ident} > ribap_roary"${ident}"_summary.txt
     """
 }

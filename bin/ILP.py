@@ -105,7 +105,8 @@ class ILPGenerator():
 
     def __init__(self, tsvFile):
         
-        self.dirname = '/'.join(tsvFile.split('/')[:-2]) + "/ilp/"
+        self.dirname = '/'.join(tsvFile.split('/')[:-2])
+        self.dirname = self.dirname + "/ilp/" if self.dirname else "ilp/"
         self.basename = tsvFile.split('/')[-1].split('.')[0]
         self.out = self.dirname+self.basename 
         
