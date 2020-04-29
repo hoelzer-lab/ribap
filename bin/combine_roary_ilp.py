@@ -323,7 +323,7 @@ def fill_group_with_genes():
                     ilpSupport[paralogGene] = set()
                     for remainingGene in genesOfGroup:
                         if remainingGene.startswith(strain):
-                            continueglob
+                            continue
                         ilpComparison = f"{strain}:{remainingGene.split('_')[0]}"
                         # ilps[ilpComparison]: { strainA_geneID : strainB_geneID }
                         if paralogGene in ilps[ilpComparison]:

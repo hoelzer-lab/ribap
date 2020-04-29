@@ -31,7 +31,7 @@ process upsetr {
           mainbar.y.label = "No. of common genes", sets.x.label = "No. of identified genes", 
           nsets = 20, nintersects = 40,
           order.by = "freq", sets.bar.color = "#56B4E9", keep.order = F, 
-          text.scale = 1.4, point.size = 2.6, line.size = 0.8, set_size.show = TRUE)
+          text.scale = 1.4, point.size = 2.6, line.size = 0.8, set_size.show = FALSE)
       dev.off()
       """
 }
@@ -70,7 +70,7 @@ process upsetr_subset {
           mainbar.y.label = "No. of common genes", sets.x.label = "No. of identified genes", 
           nsets = 20, nintersects = 40,
           order.by = "freq", sets.bar.color = "#56B4E9", keep.order = T, 
-          text.scale = 1.4, point.size = 2.6, line.size = 0.8, set_size.show = TRUE)
+          text.scale = 1.4, point.size = 2.6, line.size = 0.8, set_size.show = FALSE)
       dev.off()
         """
 }

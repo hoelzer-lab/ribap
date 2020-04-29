@@ -12,7 +12,9 @@ process mafft {
 
   script:
     """
-      mafft ${faa} > "\$(basename ${faa} .faa)"_mafft.aln 
+      for FAA in *.faa; do 
+        mafft \${FAA} > "\$(basename \${FAA} .faa)"_mafft.aln
+      done 
     """
 }
 

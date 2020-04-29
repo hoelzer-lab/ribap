@@ -124,18 +124,19 @@ workflow {
       .combine(gff_ch).groupTuple())
 
   combine_roary_ilp(combine_ch, ilp_solve.out.flatten().toList()) 
-/*
+
 
 
   // select only the 95 combined output file
   identity_ch = Channel.from(95)
-  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), faa_ch)
-  
+  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), prokka.out[1].map { id, faa -> faa}.collect())
+
+  // 50 alignments will be processed one after the other
   nw_display(
     fasttree(
-      mafft(
-        prepare_msa.out.flatten()
-     )
+      mafft(  
+        prepare_msa.out.flatten().buffer(size: 50, remainder: true)
+      )
     )
   )
 
@@ -150,7 +151,6 @@ workflow {
 
   if (params.tree) {raxml(combine_msa.out)}
 
-*/
 }
 
 
