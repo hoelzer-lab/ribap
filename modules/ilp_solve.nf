@@ -14,6 +14,8 @@ process ilp_solve {
 
   script:
     """
+    # can we use parallel inside a docker?
+
     mkdir solved
     for ILP in ilp/*.ilp; do 
       BN=\$(basename \$ILP .ilp)
