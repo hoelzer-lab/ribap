@@ -5,6 +5,9 @@ process ilp_solve {
 //  publishDir "${params.output}/ilp/solved", mode: 'copy', pattern: "*sol" 
   publishDir "${params.output}/ilp/solved", mode: 'copy', pattern: "simple*" 
 
+// there is a problem with multiple use of variable 'x_A1h_A1t', see issue #11
+  errorStrategy{task.exitStatus=101 ?'ignore':'terminate'}
+
   input: 
     tuple val(name), path(ilp)
 
