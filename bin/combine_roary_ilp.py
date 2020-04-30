@@ -410,28 +410,28 @@ POS = list(range(14,14+NUMSTRAINS))
 # read and parse the roary table
 # function for roary parsing
 read_roary_table(sys.argv[2])
-print(genes[DEBUG_GENE])
-print(cluster2gene[genes[DEBUG_GENE]])
-print()
+#print(genes[DEBUG_GENE])
+#print(cluster2gene[genes[DEBUG_GENE]])
+#print()
 ##########################################
 
 # reading pairwise ILPs
 ilps = {}
 read_pairwise_ILPs(sys.argv[3])
-for strain in id2strain:
-    if strain == DEBUG_STRAIN: continue
-    ilpHit = ilps[f"{DEBUG_STRAIN}:{strain}"][DEBUG_GENE]
-    print(ilpHit)
-    print(ilps[f"{strain}:{DEBUG_STRAIN}"][ilpHit])
-    print()
+#for strain in id2strain:
+#    if strain == DEBUG_STRAIN: continue
+#    ilpHit = ilps[f"{DEBUG_STRAIN}:{strain}"][DEBUG_GENE]
+#    print(ilpHit)
+#    print(ilps[f"{strain}:{DEBUG_STRAIN}"][ilpHit])
+#    print()
 
 ##########################################
 
 # read prokka gene annotations
 geneAnnotations, geneNames = read_prokka_annotions(sys.argv[3])
-print(geneAnnotations[DEBUG_GENE])
-print(geneNames[DEBUG_GENE])
-print()
+#print(geneAnnotations[DEBUG_GENE])
+#print(geneNames[DEBUG_GENE])
+#print()
 
 ##########################################
 
