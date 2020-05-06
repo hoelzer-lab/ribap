@@ -224,6 +224,8 @@ ALL="$OUTDIR"/mmseq2/all_proteins.fa
 cat "$OUTDIR"/prokka/*/*.faa > "$ALL"
 MMSEQDB="$OUTDIR"/mmseq2/mmseq2.db
 
+MMDIR=/home/co68mol/miniconda3/envs/mmseq
+PATH=$PATH:/home/co68mol/miniconda3/envs/mmseq/bin/
 
 #makeblastdb -in "$ALL" -dbtype prot -parse_seqids >/dev/null
 #blastp -task blastp -num_threads "$CPUS" -query "$ALL" -db "$ALL" -evalue 1e-10 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend qlen sstart send evalue bitscore slen" | awk '{if($3>60 && $4>($9*0.4)){print $0}}' > "$OUTDIR"/blast/all_vs_all.blast 2>/dev/null
@@ -249,7 +251,7 @@ fi
 
 mkdir -p "$OUTDIR"/tsv
 ulimit -n 4096
-$DIR/scripts/blast2tsv.py "$MMSEQ" "$STRAIN_IDS" "$OUTDIR"/tsv
+"$DIR"/bin/blast2tsv.py "$MMSEQ" "$STRAIN_IDS" "$OUTDIR"/tsv
 ulimit -n 1024
 mkdir -p "$OUTDIR"/ilp
 #pairwise ILP comparison
@@ -262,7 +264,7 @@ echo 'PMID: 25859276'
 echo '---------------------------------'
 echo ''
 
-parallel -j "$CPUS" ''"$DIR"'/scripts/ILP.py --max --indel {} > '"$OUTDIR"'/ilp/{/.}.ilp 2>/dev/null' ::: "$OUTDIR"/tsv/*tsv 2>/dev/null
+parallel -j "$CPUS" ''"$DIR"'/bin/ILP.py --max --indel {}' ::: "$OUTDIR"/tsv/*tsv #2>/dev/null
 
 if [ "$VERBOSE" ]; then
     log_message 'ILPs are prepared. Solving all of them might'
@@ -273,23 +275,59 @@ fi
 #print_citation
 echo ''
 echo 'ILPs are solved using the freely-available ILP solver GLPK.'
-#echo 'Copyright (C) 2000-2017 Andrew Makhorin, Department for Applied'
-#echo 'Informatics, Moscow Aviation Institute, Moscow, Russia. All rights'
-#echo 'reserved. E-mail: <mao@gnu.org>.'
-#echo ''
-#echo 'This program has ABSOLUTELY NO WARRANTY.'
-#echo ''
-#echo 'This program is free software; you may re-distribute it under the terms'
-#echo 'of the GNU General Public License version 3 or later.'
+echo 'Copyright (C) 2000-2017 Andrew Makhorin, Department for Applied'
+echo 'Informatics, Moscow Aviation Institute, Moscow, Russia. All rights'
+echo 'reserved. E-mail: <mao@gnu.org>.'
+echo ''
+echo 'This program has ABSOLUTELY NO WARRANTY.'
+echo ''
+echo 'This program is free software; you may re-distribute it under the terms'
+echo 'of the GNU General Public License version 3 or later.'
 echo ''
 
 parallel -j "$CPUS" 'glpsol --lp {} --mipgap 0.01 --memlim 16834 --tmlim 120 -o {.}.sol >/dev/null' ::: "$OUTDIR"/ilp/*ilp 2>/dev/null
 
-function awk_parallel_magic {
-    awk '$2 ~ /x_A.*_B/ {print}' $1 > ${1%.*}.simple
+
+# hardcoded stuff is hardcoded
+#CPLEX="/home/kevin/program/CPLEX_Studio128/cplex/bin/x86-64_linux/cplex"
+#for ILP in "$OUTDIR"/ilp/*ilp; do
+#    "$CPLEX" -c "read $ILP" "lp" "set timelimit 3600" "set mip tolerances mipgap 0.01" "set threads $CPUS" "set workmem 16384" "opt" "set output writelevel 3" "write ${ILP%.*}.sol" "y" "quit" 2>/dev/null
+#done
+
+#for SOL in "$OUTDIR"/ilp/*sol; do
+#    python3 "$DIR"/bin/cplexsol_to_simple.py "$SOL"
+#done
+
+#for SIMPLE in "$OUTDIR"/ilp/*simple.1; do
+#    #grep -E '^x_' "$SIMPLE" > "${SIMPLE%.*}"
+#    awk '/^x_/ {print $2,$1}' "$SIMPLE" > "${SIMPLE%.*}"
+#done
+
+#function awk_parallel_magic {
+#    awk '$2 ~ /x_A.*_B/ && $4 == 1 {print}' $1 > ${1%.*}.simple
+#}
+#export -f awk_parallel_magic
+#parallel -j "$CPUS" 'awk_parallel_magic {}' ::: "$OUTDIR"/ilp/*sol 2>/dev/null
+
+
+#for SOL in for SOL in "$OUTDIR"/ilp/*sol; do
+#    sed -E -i '/x_A[^[:space:]]+$/ N;s/\n//g' "$SOL"
+#done
+
+function sed_parallel_remove_newline_in_sol {
+    sed -E -i '/x_A[^[:space:]]+$/ N;s/\n//g' "$1"
 }
-export -f awk_parallel_magic
-parallel -j "$CPUS" 'awk_parallel_magic {}' ::: "$OUTDIR"/ilp/*sol 2>/dev/null
+
+export -f sed_parallel_remove_newline_in_sol
+parallel -j "$CPUS" 'sed_parallel_remove_newline_in_sol {}' ::: "$OUTDIR"/ilp/*sol
+
+for tsv in "$OUTDIR"/tsv/*tsv; do
+    BN=$(basename $tsv .tsv)
+    for SOL in "$OUTDIR"/ilp/"$BN"*sol; do
+        #sed -E -i '/x_A[^[:space:]]+$/ N;s/\n//g' "$SOL"
+        awk '$2 ~ /x_A.*_/ && $4 == 1 {print}' "$SOL"
+    done > "$OUTDIR"/ilp/"$BN".ilp.simple
+done
 
 if [ "$VERBOSE" ]; then
     log_message 'ILPs are solved.'
@@ -299,7 +337,7 @@ if [ "$VERBOSE" ]; then
 fi
 
 for IDENT in 60 70 80 90 95; do
-    python3 "$DIR"/scripts/combine_roary_ilp.py "$OUTDIR"/strain_ids.txt "$OUTDIR"/roary/"$IDENT"/gene_presence_absence.csv "$OUTDIR"/ilp/ "$OUTDIR"/holy_python_ribap_"$IDENT".csv > "$OUTDIR"/ribap_roary"$IDENT"_summary.txt
+    python3 "$DIR"/bin/combine_roary_ilp.py "$OUTDIR"/strain_ids.txt "$OUTDIR"/roary/"$IDENT"/gene_presence_absence.csv "$OUTDIR"/ilp/ "$OUTDIR"/holy_python_ribap_"$IDENT".csv "$IDENT" > "$OUTDIR"/ribap_roary"$IDENT"_summary.txt
 done
 
 if [ "$VERBOSE" ]; then
@@ -310,7 +348,7 @@ if [ "$VERBOSE" ]; then
 fi
 
 mkdir -p "$OUTDIR"/msa
-python3 "$DIR"/scripts/create_msa_tree.py "$OUTDIR" "$OUTDIR"/holy_python_ribap_95.csv
+python3 "$DIR"/bin/create_msa_tree.py "$OUTDIR" "$OUTDIR"/holy_python_ribap_95.csv
 
 #The Newick Utilities: High-throughput Phylogenetic tree Processing in the UNIX Shell
 #Thomas Junier and Evgeny M. Zdobnov
@@ -323,7 +361,7 @@ parallel -j "$CPUS" 'fasttree {} > {.}_tree.nwk 2>/dev/null' ::: "$OUTDIR"/msa/g
 parallel -j "$CPUS" 'nw_display -v 25 -i "font-size:6" -l "font-size:12;font-family:helvetica;font-style:italic" -Il -w 750 -b "opacity:0" -s {} > {.}.svg 2>/dev/null' ::: "$OUTDIR"/msa/*nwk 2>/dev/null
 #parallel -j "$CPUS" 'nw_display {} > {.}.ascii' ::: "$OUTDIR"/msa/*nwk
 
-python3 "$DIR"/scripts/concat_coreMSA.py "$OUTDIR"/msa "$NUMSTRAINS"
+python3 "$DIR"/bin/concat_coreMSA.py "$OUTDIR"/msa "$NUMSTRAINS"
 
 mkdir -p "$OUTDIR"/coreGenome/
 mv "$OUTDIR"/msa/coreGenome_mafft.aln "$OUTDIR"/coreGenome/
@@ -348,6 +386,9 @@ fi
 rm "$OUTDIR"/msa/*faa
 mkdir -p "$OUTDIR"/web
 mkdir -p "$OUTDIR"/tree
+wget https://www.rna.uni-jena.de/supplements/ribap/web.tar.gz
+tar zxvf web.tar.gz
+gunzip -r web
 cp -r "$DIR"/web/* "$OUTDIR"/web
 cp "$OUTDIR"/msa/*svg "$OUTDIR"/tree
 
@@ -356,7 +397,7 @@ if [ "$VERBOSE" ]; then
     echo ''
 fi
 
-python3 "$DIR"/scripts/generate_html.py "$OUTDIR" > "$OUTDIR"/web/ribap.html
+python3 "$DIR"/bin/generate_html.py "$OUTDIR" > "$OUTDIR"/web/ribap.html
 cd "$OUTDIR"/
 ln -s web/ribap.html .
 

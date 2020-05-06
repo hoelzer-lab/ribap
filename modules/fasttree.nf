@@ -12,7 +12,9 @@ process fasttree {
 
   script:
     """
-    fasttree *.aln > "\$(basename ${aln} _mafft.aln)"_tree.nwk 
+    for ALN in *.aln; do
+      fasttree \${ALN} > "\$(basename \${ALN} _mafft.aln)"_tree.nwk 
+    done
     """
 }
 

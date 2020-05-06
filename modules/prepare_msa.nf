@@ -3,20 +3,23 @@
 process prepare_msa {
   label 'python3'
   errorStrategy{task.exitStatus=1 ?'ignore':'terminate'}
-  publishDir "${params.output}/msa/", mode: 'copy', pattern: "*.faa" 
+  publishDir "${params.output}/msa/", mode: 'copy', pattern: "msa/*.faa" 
 
   input: 
-    tuple val(ident), file(holy_ribap_csv)
-    file(faa)
+    tuple val(ident), path(holy_ribap_csv)
+    path(faa)
 
   output:
-    file("*.faa")
+    file("msa/*.faa")
 
   script:
     """
+      mkdir faa
+      cp *.faa faa/
+
       mkdir msa
       create_msa_tree.py . ${holy_ribap_csv}
-      mv msa/*.faa .
+      #mv msa/*.faa .
     """
 }
 

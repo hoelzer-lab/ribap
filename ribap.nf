@@ -109,9 +109,11 @@ workflow {
   ilp_solve(
     ilp_build(
       blast2tsv(mmseqs2.out, strain_ids.out).flatten()
-    ).flatten()
+    )
   )
+
   
+
   //copy all *sol and *simple into a solved folder for ilp_solve
   combine_ch = identity_ch
     .join(roary.out)
@@ -120,20 +122,21 @@ workflow {
       .combine(strain_ids.out))
     .join(identity_ch
       .combine(gff_ch).groupTuple())
-  combine_roary_ilp(combine_ch, ilp_solve.out.flatten().toList())
-//    .join(identity_ch.combine(
-//      ilp_solve.out.flatten().toList())) 
+
+  combine_roary_ilp(combine_ch, ilp_solve.out.flatten().toList()) 
+
 
 
   // select only the 95 combined output file
   identity_ch = Channel.from(95)
-  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), faa_ch)
-  
+  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), prokka.out[1].map { id, faa -> faa}.collect())
+
+  // 50 alignments will be processed one after the other
   nw_display(
     fasttree(
-      mafft(
-        prepare_msa.out.flatten()
-     )
+      mafft(  
+        prepare_msa.out.flatten().buffer(size: 50, remainder: true)
+      )
     )
   )
 
@@ -147,6 +150,7 @@ workflow {
   if (params.sets) {upsetr_subset(generate_upsetr_input.out[1])}
 
   if (params.tree) {raxml(combine_msa.out)}
+
 }
 
 
@@ -177,6 +181,7 @@ def helpMSG() {
     ${c_dim}  ..change above input to csv:${c_reset} ${c_green}--list ${c_reset}            
 
     ${c_yellow}Params:${c_reset}
+    --tmlim             Time limit for ILP solve [default: $params.tmlim]
     --gcode             Genetic code for Prokka annotation [default: $params.gcode]
     --tree              build tree based on the core genome? 
                         Sure thing, We will use RAxML for this. 
