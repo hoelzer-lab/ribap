@@ -2,7 +2,7 @@
 
 process ilp_build {
   label 'python3'
-  //publishDir "${params.output}/ilp/", mode: 'copy', pattern: "ilp" 
+  publishDir "${params.output}/ilp/", mode: 'copy', pattern: "ilp" 
 
   input: 
     file(tsv)

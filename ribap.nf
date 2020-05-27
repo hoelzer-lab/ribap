@@ -123,7 +123,7 @@ workflow {
     .join(identity_ch
       .combine(gff_ch).groupTuple())
 
-  combine_roary_ilp(combine_ch, ilp_solve.out.simple.flatten().toList()) 
+  combine_roary_ilp(combine_ch, ilp_solve.out[0].flatten().toList()) 
 
 
 
