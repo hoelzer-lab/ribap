@@ -2,10 +2,12 @@
 
 process ilp_solve {
   label 'glpk'
-//  publishDir "${params.output}/ilp/solved", mode: 'copy', pattern: "*sol" 
+  publishDir "${params.output}/ilp/solved", mode: 'copy', pattern: "solved/*.sol" 
   publishDir "${params.output}/ilp/solved", mode: 'copy', pattern: "simple*" 
 
 // there is a problem with multiple use of variable 'x_A1h_A1t', see issue #11
+// it seems that the problem only occurs for longer tmlim because the 33er set was running 
+// through with 240s but the error occured for 7200s
   errorStrategy{task.exitStatus=101 ?'ignore':'terminate'}
 
   input: 
@@ -13,7 +15,8 @@ process ilp_solve {
 
   output:
 //    tuple file("solved/*.sol"), file("simple/*.simple")
-      path("simple*", type: 'dir')
+      path("simple*", type: 'dir'), emit: simple
+      path("solved/*.sol"), emit: sol
 
   script:
     """
