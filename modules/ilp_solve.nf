@@ -5,10 +5,8 @@ process ilp_solve {
   publishDir "${params.output}/ilp/", mode: 'copy', pattern: "solved/*.sol" 
   publishDir "${params.output}/ilp/simple", mode: 'copy', pattern: "simple*" 
 
-// there is a problem with multiple use of variable 'x_A1h_A1t', see issue #11
-// it seems that the problem only occurs for longer tmlim because the 33er set was running 
-// through with 240s but the error occured for 7200s
-  errorStrategy{task.exitStatus=101 ?'ignore':'terminate'}
+//  there was a problem with multiple use of variable 'x_A1h_A1t', see issue #11
+//  errorStrategy{task.exitStatus=101 ?'ignore':'terminate'}
 
   input: 
     tuple val(name), path(ilp)
