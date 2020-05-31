@@ -240,6 +240,8 @@ def create_ribap_groups():
                 assignedGroups[f'group{groupCounter}'] = set(clusters)
 
 def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCounter, subgroups={}):
+    """
+    """
     paralogForMainGroup = {}
     for strain, paralogs in strain2paralogs.items():
         if not paralogs:
@@ -252,7 +254,7 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
         roaryScore = 0
         roaryScores = []
 
-        ## 1) select gene based on ILP support    for strain, paralogs in strain2paralogs.items():
+        ## 1) select gene based on ILP support for strain, paralogs in strain2paralogs.items():
         # which of our paralog genes has the most ILP hits to other strains
         for gene in paralogs:
             ilpScores.append(len(geneHits[gene]))
@@ -270,9 +272,18 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
                     roaryScore = len(cluster2gene[genes[gene]])
 
         ## 3) if all dudes have the same ILP support and Roary score, just select the first occuring dude
-        #FixMe: make a better choice based on GeneNames and/or Annotation
+        
+
         if len(set(ilpScores)) == 1 and len(set(roaryScores)) == 1:
-            paralogWithMaxScore = paralogs[0]
+            #FixMe: make a better choice based on GeneNames and/or Annotation
+            currentGroup = assignedGroups[groupID]
+            annotations = [geneAnnotations[gene] for gene in currentGroup]
+            for candidateParalog in paralogs:
+                candidateAnno = geneAnnotations[candidateParalog]
+                if candidateAnno == max(annotations):
+                    paralogWithMaxScore = candidateParalog
+                    continue
+            #paralogWithMaxScore = paralogs[0]
         paralogForMainGroup[strain] = paralogWithMaxScore
         try:
             paralogs.remove(paralogWithMaxScore)
