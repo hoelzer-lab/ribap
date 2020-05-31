@@ -280,7 +280,7 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
             currentGroup = assignedGroups[groupID]
             
             annotations = [geneAnnotations[gene] for gene in currentGroup]
-            mostCommonAnnotation = max(annotations, key=annotations.count())
+            mostCommonAnnotation = max(annotations, key=annotations.count)
 
             for candidateParalog in paralogs:
                 candidateAnno = geneAnnotations[candidateParalog]
