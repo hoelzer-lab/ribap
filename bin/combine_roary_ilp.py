@@ -248,7 +248,7 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
             continue
         paralogWithMaxScore = None
         paralogFound = False
-        
+
         ilpScore = 0
         ilpScores = []
 
@@ -287,7 +287,7 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
                 if candidateAnno == mostCommonAnnotation:
                     paralogFound = True
                     paralogWithMaxScore = candidateParalog
-                    continue
+                    break
         else:
             paralogFound = True
         
