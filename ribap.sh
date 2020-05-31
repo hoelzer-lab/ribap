@@ -238,8 +238,12 @@ mmseqs search "$MMSEQDB" "$MMSEQDB" "${MMSEQDB%.*}_result" "$OUTDIR"/mmseq2/tmp 
 echo "Converting results"
 mmseqs convertalis "$MMSEQDB" "$MMSEQDB" "${MMSEQDB%.*}_result" "${MMSEQDB%.*}_result.csv"
 
+
+"${MMSEQDB%.*}_result.csv" | awk '{if($3>60 && $4>($9*0.4)){print $0}}' > "${MMSEQDB%.*}_result_filtered.csv" 2>/dev/null
+
+
 #create single .tsv from blastout
-MMSEQ="${MMSEQDB%.*}_result.csv"
+MMSEQ="${MMSEQDB%.*}_result_filtered.csv"
 #BLAST="$OUTDIR"/blast/all_vs_all.blast
 STRAIN_IDS="$OUTDIR"/strain_ids.txt # this needs to be automatically generated after the prokka runs # Done ;)
 

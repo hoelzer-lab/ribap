@@ -270,6 +270,7 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
                     roaryScore = len(cluster2gene[genes[gene]])
 
         ## 3) if all dudes have the same ILP support and Roary score, just select the first occuring dude
+        #FixMe: make a better choice based on GeneNames and/or Annotation
         if len(set(ilpScores)) == 1 and len(set(roaryScores)) == 1:
             paralogWithMaxScore = paralogs[0]
         paralogForMainGroup[strain] = paralogWithMaxScore
@@ -365,8 +366,6 @@ def write_output(outputFile, ident):
             for group, geneArray in assignedGroups.items():
                 if not geneArray:
                     continue
-                #print(geneArray)
-                #print(geneAnnotations)
                 annotations = [geneAnnotations[x] for x in geneArray]
                 names = [geneNames[x] for x in geneArray]
                 
@@ -390,9 +389,6 @@ def write_output(outputFile, ident):
 
 ##########################################
 
-DEBUG_STRAIN = "JGDJAKFF"
-DEBUG_GENE = "JGDJAKFF_00061"
-
 # structures we need during the script
 genes = {}
 cluster2gene = defaultdict(list)
@@ -403,7 +399,6 @@ assignedGroups = {}
 
 # read strain IDs from Prokka
 strain2id, id2strain = read_strains(sys.argv[1])
-#print(f"Read in {len(strain2id.keys())} genome IDs")
 NUMSTRAINS = len(strain2id.keys())
 POS = list(range(14,14+NUMSTRAINS))
 
@@ -412,28 +407,17 @@ POS = list(range(14,14+NUMSTRAINS))
 # read and parse the roary table
 # function for roary parsing
 read_roary_table(sys.argv[2])
-#print(genes[DEBUG_GENE])
-#print(cluster2gene[genes[DEBUG_GENE]])
-#print()
+
 ##########################################
 
 # reading pairwise ILPs
 ilps = {}
 read_pairwise_ILPs(sys.argv[3])
-#for strain in id2strain:
-#    if strain == DEBUG_STRAIN: continue
-#    ilpHit = ilps[f"{DEBUG_STRAIN}:{strain}"][DEBUG_GENE]
-#    print(ilpHit)
-#    print(ilps[f"{strain}:{DEBUG_STRAIN}"][ilpHit])
-#    print()
 
 ##########################################
 
 # read prokka gene annotations
 geneAnnotations, geneNames = read_prokka_annotions(sys.argv[3])
-#print(geneAnnotations[DEBUG_GENE])
-#print(geneNames[DEBUG_GENE])
-#print()
 
 ##########################################
 
