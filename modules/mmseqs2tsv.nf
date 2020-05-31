@@ -1,6 +1,6 @@
 /*Comment section: */
 
-process blast2tsv {
+process mmseq2tsv {
   label 'python3'
   publishDir "${params.output}/blast2tsv", mode: 'copy', pattern: "*.tsv" 
 
