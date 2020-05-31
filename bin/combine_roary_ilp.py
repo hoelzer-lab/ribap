@@ -136,11 +136,12 @@ def read_pairwise_ILPs(ilpPath):
 
                 # weird parsing stuff;  x_A456h_B458h --> DCKEFHG_456 and TYQFDEEW_458
                 # map ILP syntax back to Prokka gene IDs
+                # A2h_B4t
                 headGene1 = relationHeads.split('_')[1].replace('h','').replace('A', f"{strain1}_")
-                headGene2 = relationHeads.split('_')[2].replace('h','').replace('B', f"{strain2}_")
+                headGene2 = relationHeads.split('_')[2].replace('t','').replace('h','').replace('B', f"{strain2}_")
                 #headGene2 = relationHeads.split('_')[2].split('h')[0].replace('B', f"{strain2}_")
                 tailGene1 = relationTails.split('_')[1].replace('t','').replace('A', f"{strain1}_")
-                tailGene2 = relationTails.split('_')[2].replace('t','').replace('B', f"{strain2}_")
+                tailGene2 = relationTails.split('_')[2].replace('h','').replace('t','').replace('B', f"{strain2}_")
                 #tailGene2 = relationTails.split('_')[2].split('t')[0].replace('B', f"{strain2}_")
 
                 # call adjust_length for be consistent with Prokka gene ID

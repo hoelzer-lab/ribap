@@ -340,9 +340,12 @@ if [ "$VERBOSE" ]; then
     echo ''
 fi
 
-for IDENT in 60 70 80 90 95; do
-    python3 "$DIR"/bin/combine_roary_ilp.py "$OUTDIR"/strain_ids.txt "$OUTDIR"/roary/"$IDENT"/gene_presence_absence.csv "$OUTDIR"/ilp/ "$OUTDIR"/holy_python_ribap_"$IDENT".csv "$IDENT" > "$OUTDIR"/ribap_roary"$IDENT"_summary.txt
-done
+#for IDENT in 60 70 80 90 95; do
+#    python3 "$DIR"/bin/combine_roary_ilp.py "$OUTDIR"/strain_ids.txt "$OUTDIR"/roary/"$IDENT"/gene_presence_absence.csv "$OUTDIR"/ilp/ "$OUTDIR"/holy_python_ribap_"$IDENT".csv "$IDENT" > "$OUTDIR"/ribap_roary"$IDENT"_summary.txt
+#done
+
+IDENT=95
+python3 "$DIR"/bin/combine_roary_ilp.py "$OUTDIR"/strain_ids.txt "$OUTDIR"/roary/"$IDENT"/gene_presence_absence.csv "$OUTDIR"/ilp/ "$OUTDIR"/holy_python_ribap_"$IDENT".csv "$IDENT" > "$OUTDIR"/ribap_roary"$IDENT"_summary.txt
 
 if [ "$VERBOSE" ]; then
     log_message 'All roary clusters have been refined with the ILPs'
