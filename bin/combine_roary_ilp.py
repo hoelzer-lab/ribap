@@ -285,8 +285,6 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
             currentGroup = assignedGroups[groupID]
             
             annotations = [geneAnnotations[gene] for gene in currentGroup]
-            print(annotations)
-            print(groupID, currentGroup, strain2paralogs)
             mostCommonAnnotation = max(annotations, key=annotations.count)
 
             for candidateParalog in paralogs:
@@ -328,7 +326,6 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
             assignedGroups[groupID].remove(removableGene)    
     except ValueError:
         exit(1)
-    print(subgroups)
     return subgroups
 
 def fill_group_with_genes():
