@@ -236,10 +236,10 @@ mmseqs createindex "$MMSEQDB" "$OUTDIR"/mmseq2/tmp
 echo "Starting MMSeqs2 Search"
 mmseqs search "$MMSEQDB" "$MMSEQDB" "${MMSEQDB%.*}_result" "$OUTDIR"/mmseq2/tmp -a
 echo "Converting results"
-mmseqs convertalis --format-output "query,target,pident,alnlen,mismatch,gapopen,qstart,qend,qlen,tstart,tend,tlen,evalue,bits" "$MMSEQDB" "$MMSEQDB" "${MMSEQDB%.*}_result" "${MMSEQDB%.*}_result.csv"
+mmseqs convertalis --format-output "query,target,pident,alnlen,mismatch,gapopen,qstart,qend,qlen,tstart,tend,tlen,qcov,tcov,evalue,bits" "$MMSEQDB" "$MMSEQDB" "${MMSEQDB%.*}_result" "${MMSEQDB%.*}_result.csv"
 
 
-"${MMSEQDB%.*}_result.csv" | awk '{if($3>60 && $4>($9*0.4)){print $0}}' > "${MMSEQDB%.*}_result_filtered.csv" 2>/dev/null
+"${MMSEQDB%.*}_result.csv" | awk '{ if ( $3 > 0.6 && $13 > 0.4 ) {print $0} }' > "${MMSEQDB%.*}_result_filtered.csv" 2>/dev/null
 
 
 #create single .tsv from blastout
