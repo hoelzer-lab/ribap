@@ -19,7 +19,7 @@ process ilp_solve {
     """
     # can we use parallel inside a docker? seems so
     mkdir solved
-    cp ilp/*.ilp .
+    cp ilp_*/*.ilp .
     ls *.ilp | parallel -j "${task.cpus}" -I% --max-args 1 glpsol --lp % --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim ${params.tmlim} -o solved/%.sol
     rm *.ilp
     for SOL in solved/*.sol; do

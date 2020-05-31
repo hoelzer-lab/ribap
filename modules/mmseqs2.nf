@@ -25,9 +25,9 @@ process mmseqs2 {
     #Starting MMSeqs2 Search
     mmseqs search --threads ${task.cpus} \$MMSEQDB \$MMSEQDB "\${MMSEQDB%.*}_result" mmseq2/tmp -a
     #Converting results
-    mmseqs convertalis --threads ${task.cpus} \$MMSEQDB \$MMSEQDB "\${MMSEQDB%.*}_result" "\${MMSEQDB%.*}_result.csv"
+    mmseqs convertalis --format-output "query,target,pident,alnlen,mismatch,gapopen,qstart,qend,qlen,tstart,tend,tlen,qcov,tcov,evalue,bits" --threads ${task.cpus} \$MMSEQDB \$MMSEQDB "\${MMSEQDB%.*}_result" "\${MMSEQDB%.*}_result.csv"
 
-    cat "\${MMSEQDB%.*}_result.csv" | awk '{if(\$3>0.6 && \$4>(\$9*0.4)){print \$0}}' > "\${MMSEQDB%.*}_result_filtered.csv"
+    cat "\${MMSEQDB%.*}_result.csv" | awk '{if(\$3>0.6 && \$13>0.4){print \$0}}' > "\${MMSEQDB%.*}_result_filtered.csv"
 
     mv mmseq2/mmseq2_result.csv .
     mv mmseq2/mmseq2_result_filtered.csv .

@@ -2,13 +2,13 @@
 
 process ilp_build {
   label 'python3'
-  publishDir "${params.output}/ilp/", mode: 'copy', pattern: "ilp" 
+  publishDir "${params.output}/ilp/", mode: 'copy', pattern: "ilp_*" 
 
   input: 
     file(tsv)
 
   output:
-    tuple env(BN), path('ilp', type: 'dir')
+    tuple env(BN), path("ilp_*", type: 'dir')
 
   script:
     """
@@ -19,6 +19,9 @@ process ilp_build {
 
     mkdir ilp
     ILP.py --max --indel ${tsv}
+
+    TMP=\$(basename \$PWD)
+    mv ilp ilp_"\${TMP}"
 
     echo \$BN
     """
