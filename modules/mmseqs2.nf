@@ -3,12 +3,14 @@
 process mmseqs2 {
   label 'mmseqs2'
   publishDir "${params.output}/mmseqs2", mode: 'copy', pattern: "mmseq2_result.csv" 
+  publishDir "${params.output}/mmseqs2", mode: 'copy', pattern: "mmseq2_result_filtered.csv" 
 
   input: 
     file(fasta)
 
   output:
-    file("mmseq2_result.csv")
+    path("mmseq2_result.csv")
+    path("mmseq2_result_filtered.csv")
 
   script:
     """
@@ -25,9 +27,10 @@ process mmseqs2 {
     #Converting results
     mmseqs convertalis --threads ${task.cpus} \$MMSEQDB \$MMSEQDB "\${MMSEQDB%.*}_result" "\${MMSEQDB%.*}_result.csv"
 
-    #create single .tsv
-    MMSEQ="\${MMSEQDB%.*}_result.csv"
+    cat "\${MMSEQDB%.*}_result.csv" | awk '{if(\$3>0.6 && \$4>(\$9*0.4)){print \$0}}' > "\${MMSEQDB%.*}_result_filtered.csv"
+
     mv mmseq2/mmseq2_result.csv .
+    mv mmseq2/mmseq2_result_filtered.csv .
     """
 }
 
