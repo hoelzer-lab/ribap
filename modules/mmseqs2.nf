@@ -31,7 +31,7 @@ process mmseqs2 {
     """
 }
 
-process mmseq2tsv {
+process mmseqs2tsv {
   label 'python3'
   publishDir "${params.output}/blast2tsv", mode: 'copy', pattern: "*.tsv" 
 

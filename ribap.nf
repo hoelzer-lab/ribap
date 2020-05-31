@@ -68,7 +68,7 @@ include rename from './modules/rename'
 include prokka from './modules/prokka' 
 include strain_ids from './modules/strain_ids' 
 include roary from './modules/roary' 
-include {mmseqs2; mmseq2tsv} from './modules/mmseqs2'
+include {mmseqs2; mmseqs2tsv} from './modules/mmseqs2'
 include ilp_build from './modules/ilp_build'
 include ilp_solve from './modules/ilp_solve' 
 include combine_roary_ilp from './modules/combine_roary_ilp'
@@ -107,7 +107,7 @@ workflow {
 
   ilp_solve(
     ilp_build(
-      mmseq2tsv(mmseqs2.out, strain_ids.out).flatten()
+      mmseqs2tsv(mmseqs2.out, strain_ids.out).flatten()
     )
   )
 
