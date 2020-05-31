@@ -73,10 +73,10 @@ with open(blast, 'r') as inputStream:
 
 
 
-        seqSim = currentEntry[2]
+        seqSim = currentEntry[-1]
 
         # orientation is needed to encode whether a gene is reversed in a strain
-        if int(currentEntry[8]) > int(currentEntry[9]):
+        if int(currentEntry[6]) > int(currentEntry[7]):
             orientation = -1
         else:
             orientation = 1    
