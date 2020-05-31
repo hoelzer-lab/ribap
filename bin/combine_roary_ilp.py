@@ -277,12 +277,16 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
         if len(set(ilpScores)) == 1 and len(set(roaryScores)) == 1:
             #FixMe: make a better choice based on GeneNames and/or Annotation
             currentGroup = assignedGroups[groupID]
+            
             annotations = [geneAnnotations[gene] for gene in currentGroup]
+            annotations = {x : annotations.count(x) for x in annotations}
+
             for candidateParalog in paralogs:
                 candidateAnno = geneAnnotations[candidateParalog]
                 if candidateAnno == max(annotations):
                     paralogWithMaxScore = candidateParalog
                     continue
+
             #paralogWithMaxScore = paralogs[0]
         paralogForMainGroup[strain] = paralogWithMaxScore
         try:
