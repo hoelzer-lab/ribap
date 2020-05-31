@@ -244,9 +244,11 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
     """
     """
     paralogForMainGroup = {}
+
     for strain, paralogs in strain2paralogs.items():
         if not paralogs:
             continue
+        
         paralogWithMaxScore = None
         paralogFound = False
 
@@ -277,6 +279,8 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
         
 
         if len(set(ilpScores)) == 1 and len(set(roaryScores)) == 1:
+            paralogWithMaxScore = paralogs[0]
+
             #FixMe: make a better choice based on GeneNames and/or Annotation
             currentGroup = assignedGroups[groupID]
             
@@ -294,6 +298,7 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
         
         if not paralogFound:
             paralogWithMaxScore = paralogs[0]
+
         paralogForMainGroup[strain] = paralogWithMaxScore
         try:
             paralogs.remove(paralogWithMaxScore)
