@@ -155,6 +155,7 @@ def read_pairwise_ILPs(ilpPath):
                     ilps[comparison1][headGene1] = headGene2
                     ilps[comparison2][headGene2] = headGene1
                 else:
+                    #FixMe: Write a custom error that gets thrown here.
                     print(f"Holy Guacamolee! We lost a gene! {headGene1}, {tailGene1}, {headGene2}, {tailGene2}")
 
 def read_prokka_annotions(path):
@@ -275,6 +276,7 @@ def merge_paralogs_to_subgroup(groupID, strain2paralogs, geneHits, subgroupCount
         try:
             paralogs.remove(paralogWithMaxScore)
         except ValueError:
+            #FixMe: provide a better error handling here
             print(groupID, subgroupCounter, paralogs, paralogWithMaxScore)
             print(strain2paralogs)
             exit(0)
