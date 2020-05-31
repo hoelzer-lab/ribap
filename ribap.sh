@@ -251,7 +251,7 @@ fi
 
 mkdir -p "$OUTDIR"/tsv
 ulimit -n 4096
-"$DIR"/bin/blast2tsv.py "$MMSEQ" "$STRAIN_IDS" "$OUTDIR"/tsv
+"$DIR"/bin/mmseq2tsv.py "$MMSEQ" "$STRAIN_IDS" "$OUTDIR"/tsv
 ulimit -n 1024
 mkdir -p "$OUTDIR"/ilp
 #pairwise ILP comparison
