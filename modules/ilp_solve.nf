@@ -2,7 +2,7 @@
 
 process ilp_solve {
   label 'glpk'
-  publishDir "${params.output}/ilp/", mode: 'copy', pattern: "solved/*.sol" 
+  publishDir "${params.output}/ilp/", pattern: "solved/*.sol" 
   publishDir "${params.output}/ilp/simple", mode: 'copy', pattern: "simple*" 
 
 //  there was a problem with multiple use of variable 'x_A1h_A1t', see issue #11
