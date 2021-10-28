@@ -1,5 +1,6 @@
 #!/usr/bin/env nextflow
-nextflow.preview.dsl=2
+
+nextflow.enable.dsl=2
 
 /*
 Nextflow -- RIBAP
@@ -35,11 +36,6 @@ println "\033[2mCPUs to use: $params.cores"
 println "Output dir name: $params.output\u001B[0m"
 println " "}
 
-if( !nextflow.version.matches('20.01+') ) {
-    println "This workflow requires Nextflow version 20.01 or greater -- You are running version $nextflow.version"
-    exit 1
-}
-
 if (params.profile) { exit 1, "--profile is WRONG use -profile" }
 if (params.fasta == '' ) { exit 1, "input missing, use [--fasta]"}
 
@@ -64,24 +60,24 @@ if (params.fasta && params.list) { fasta_input_ch = Channel
 
 /* Comment section: */
 
-include rename from './modules/rename' 
-include prokka from './modules/prokka' 
-include strain_ids from './modules/strain_ids' 
-include roary from './modules/roary' 
-include {mmseqs2; mmseqs2tsv} from './modules/mmseqs2'
-include ilp_build from './modules/ilp_build'
-include ilp_solve from './modules/ilp_solve' 
-include combine_roary_ilp from './modules/combine_roary_ilp'
-include prepare_msa from './modules/prepare_msa' 
-include mafft from './modules/mafft' 
-include fasttree from './modules/fasttree'
-include nw_display from './modules/nw_display' 
-include combine_msa from './modules/combine_msa'
-include generate_html from './modules/generate_html'
-include generate_upsetr_input from './modules/generate_upsetr_input' 
-include upsetr from './modules/upsetr' 
-if (params.sets) {include upsetr_subset from './modules/upsetr'}
-if (params.tree) {include raxml from './modules/raxml'}
+include { rename } from './modules/rename' 
+include { prokka } from './modules/prokka' 
+include { strain_ids } from './modules/strain_ids' 
+include { roary } from './modules/roary' 
+include { mmseqs2; mmseqs2tsv } from './modules/mmseqs2'
+include { ilp_build } from './modules/ilp_build'
+include { ilp_solve } from './modules/ilp_solve' 
+include { combine_roary_ilp } from './modules/combine_roary_ilp'
+include { prepare_msa } from './modules/prepare_msa' 
+include { mafft } from './modules/mafft' 
+include { fasttree } from './modules/fasttree'
+include { nw_display } from './modules/nw_display' 
+include { combine_msa } from './modules/combine_msa'
+include { generate_html } from './modules/generate_html'
+include { generate_upsetr_input } from './modules/generate_upsetr_input' 
+include { upsetr } from './modules/upsetr' 
+if (params.sets) {include { upsetr_subset } from './modules/upsetr'}
+if (params.tree) {include { raxml } from './modules/raxml'}
 
 
 /************************** 
@@ -195,7 +191,8 @@ def helpMSG() {
     --width             Width of the plot [default: $params.width]
 
     ${c_yellow}Compute options:${c_reset}
-    --cores             max cores for local use [default: $params.cores]
+    --cores             max cores used per process for local use [default: $params.cores]
+    --max_cores         max cores used on the machine for local use [default: $params.max_cores]
     --memory            max memory for local use [default: $params.memory]
     --output            name of the result folder [default: $params.output]
 
@@ -204,19 +201,25 @@ def helpMSG() {
     -with-dag chart.html     generates a flowchart for the process tree
     -with-timeline time.html timeline (may cause errors)
 
-    ${c_yellow}LSF computing:${c_reset}
-    For execution of the workflow on a HPC with LSF adjust the following parameters:
-    --databases         defines the path where databases are stored [default: $params.cloudDatabase]
-    --workdir           defines the path where nextflow writes tmp files [default: $params.workdir]
-    --cachedir          defines the path where images (singularity) are cached [default: $params.cachedir] 
+    ${c_yellow}Caching:${c_reset}
+    --condaCacheDir          Location for storing the conda environments [default: $params.condaCacheDir]
+    --singularityCacheDir    Location for storing the singularity images [default: $params.singularityCacheDir]
+    -w                	     Working directory for all intermediate results [default: $params.workDir]
 
-
-    ${c_yellow}Profile:${c_reset}
-    -profile                 standard (local, pure docker) [default]
-                             conda (mixes conda and docker)
-                             lsf (HPC w/ LSF, singularity/docker)
-                             ebi (HPC w/ LSF, singularity/docker, preconfigured for the EBI cluster)
-                             ${c_reset}
+    ${c_yellow}Execution/Engine profiles:${c_reset}
+    The pipeline supports profiles to run via different ${c_green}Executers${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}conda${c_reset}
+    
+    ${c_green}Executer${c_reset} (choose one):
+      local
+      slurm
+      lsf
+    
+    ${c_blue}Engines${c_reset} (choose one):
+      conda
+      docker
+      singularity
+    
+    Per default: -profile local,conda is executed. 
     """.stripIndent()
 }
 

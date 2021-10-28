@@ -2,22 +2,19 @@
 
 process prokka {
   label 'prokka'
-  publishDir "${params.output}/prokka", mode: 'copy', pattern: "${name}.gff" 
-  publishDir "${params.output}/prokka", mode: 'copy', pattern: "${name}.faa" 
+  publishDir "${params.output}/prokka", mode: 'copy', pattern: "${name}" 
 
   input: 
     tuple val(name), file(fasta)
 
   output:
-    file("${name}.gff")
-    tuple val(name), file("${name}.faa")
+    file("${name}/${name}.gff")
+    tuple val(name), file("${name}/${name}.faa")
+    path("${name}", type: 'dir')
 
   script:
     """
-      prokka --gcode ${params.gcode} --cpus ${task.cpus} --outdir output --prefix annotation ${fasta}
-      mv output/annotation.faa ${name}.faa
-      mv output/annotation.gff ${name}.gff
-      mv output/annotation.gbk ${name}.gbk    
+      prokka --gcode ${params.gcode} --cpus ${task.cpus} --outdir ${name} --prefix ${name} ${fasta}
     """
 }
 
