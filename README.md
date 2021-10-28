@@ -21,11 +21,12 @@ similarity often underestimates the _true_ core gene set, in particular when div
 # How can I give it a try?
 Easy, you just need a working `nextflow` and `docker` or `conda` installation, see below! You have `nextflow` and `docker`? Give it a try:
 ```bash
-nextflow run hoelzer-lab/ribap --fasta "$HOME/.nextflow/assets/hoelzer-lab/ribap/data/*.fasta"
+nextflow pull hoelzer-lab/ribap
+nextflow run hoelzer-lab/ribap -r 0.6.0 --fasta "$HOME/.nextflow/assets/hoelzer-lab/ribap/data/*.fasta" -profile local,docker
 ```
 You have `nextflow` and `conda`? Okay:
 ```bash
-nextflow run hoelzer-lab/ribap --fasta "$HOME/.nextflow/assets/hoelzer-lab/ribap/data/*.fasta" -profile conda
+nextflow run hoelzer-lab/ribap -r 0.6.0 --fasta "$HOME/.nextflow/assets/hoelzer-lab/ribap/data/*.fasta" -profile local,conda
 ```
 You need some of this dependencies? See below. 
 
@@ -87,6 +88,11 @@ Get or update the workflow:
 nextflow pull hoelzer-lab/ribap
 ```
 
+Run a specific release:
+```bash
+nextflow run hoelzer-lab/ribap -r 0.6.0
+```
+
 Get help:
 ```bash
 nextflow run hoelzer-lab/ribap --help
@@ -94,7 +100,7 @@ nextflow run hoelzer-lab/ribap --help
 
 Run with RAxML tree calculation and specified output dir:
 ```bash
-nextflow run hoelzer-lab/ribap --fasta '*.fasta' --tree --outdir ~/ribap
+nextflow run hoelzer-lab/ribap -r 0.6.0 --fasta '*.fasta' --tree --outdir ~/ribap -w work
 ```
 
 # Flowchart
