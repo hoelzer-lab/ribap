@@ -4,3 +4,4 @@ channels:
   - conda-forge
 dependencies:
   - glpk=4.65
+  - parallel=20170422
