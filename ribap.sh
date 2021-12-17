@@ -20,6 +20,8 @@ function clean_tmp {
 }
 
 
+# test comment for the github internal vscode browser thingie
+
 function check_dependencies {
     [[ $(python3 --version &>/dev/null; echo $?) -gt 0 ]] && echo -e "\e[1;91mERROR: \e[0mMissing dependency - \e[38;5;32mpython3" && return 1
     [[ $(prokka -v &>/dev/null; echo $?) -gt 0 ]] && echo -e "\e[1;91mERROR: \e[0mMissing dependency - \e[38;5;32mprokka" && return 1
