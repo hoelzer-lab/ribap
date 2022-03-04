@@ -6,6 +6,7 @@ process prokka {
 
   input: 
     tuple val(name), file(fasta)
+    file(reference)
 
   output:
     file("${name}/${name}.gff")
@@ -13,8 +14,12 @@ process prokka {
     path("${name}", type: 'dir')
 
   script:
+    if (params.reference)
+    """
+      prokka --gcode ${params.gcode} --cpus ${task.cpus} --outdir ${name} --prefix ${name} --proteins ${reference} ${fasta}
+    """
+    else
     """
       prokka --gcode ${params.gcode} --cpus ${task.cpus} --outdir ${name} --prefix ${name} ${fasta}
     """
 }
-

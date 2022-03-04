@@ -54,6 +54,15 @@ if (params.fasta && params.list) { fasta_input_ch = Channel
     .map { file -> tuple(file.simpleName, file) }
 }
 
+// reference gbk file to improve annotation 
+if (params.reference) { reference_input_ch = Channel
+    .fromPath( params.reference, checkIfExists: true)
+    .map { file -> file }
+} else {
+  reference_input_ch = Channel.empty()
+}
+
+
 /************************** 
 * MODULES
 **************************/
@@ -88,7 +97,7 @@ if (params.tree) {include { raxml } from './modules/raxml'}
 
 workflow {
 
-  prokka(rename(fasta_input_ch))
+  prokka(rename(fasta_input_ch), reference_input_ch.ifEmpty([]))
   
   gff_ch = prokka.out[0]
   faa_ch = prokka.out[1].collect()
@@ -106,8 +115,6 @@ workflow {
       mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
     )
   )
-
-  
 
   //copy all *sol and *simple into a solved folder for ilp_solve
   combine_ch = identity_ch
@@ -178,6 +185,7 @@ def helpMSG() {
     ${c_yellow}Params:${c_reset}
     --tmlim             Time limit for ILP solve [default: $params.tmlim]
     --gcode             Genetic code for Prokka annotation [default: $params.gcode]
+    --reference         A reference genbank (gbk, gb) file to guide functional annotation via Prokka [defaut: $params.reference]
     --tree              build tree based on the core genome? 
                         Sure thing, We will use RAxML for this. 
                         Be aware, this will take a lot of time. [default: $params.tree]
