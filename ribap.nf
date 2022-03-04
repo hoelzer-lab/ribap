@@ -59,7 +59,7 @@ if (params.reference) { reference_input_ch = Channel
     .fromPath( params.reference, checkIfExists: true)
     .map { file -> file }
 } else {
-  reference_input_ch = Channel.empty()
+  reference_input_ch = Channel.value('false')
 }
 
 
@@ -97,7 +97,7 @@ if (params.tree) {include { raxml } from './modules/raxml'}
 
 workflow {
 
-  prokka(rename(fasta_input_ch), reference_input_ch.ifEmpty([]))
+  prokka(rename(fasta_input_ch).combine(reference_input_ch))
   
   gff_ch = prokka.out[0]
   faa_ch = prokka.out[1].collect()

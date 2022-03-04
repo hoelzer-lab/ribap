@@ -5,8 +5,7 @@ process prokka {
   publishDir "${params.output}/prokka", mode: 'copy', pattern: "${name}" 
 
   input: 
-    tuple val(name), file(fasta)
-    file(reference)
+    tuple val(name), file(fasta), file(reference)
 
   output:
     file("${name}/${name}.gff")
