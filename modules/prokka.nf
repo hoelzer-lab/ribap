@@ -13,12 +13,11 @@ process prokka {
     path("${name}", type: 'dir')
 
   script:
-    if (params.reference)
     """
-      prokka --gcode ${params.gcode} --cpus ${task.cpus} --outdir ${name} --prefix ${name} --proteins ${reference} ${fasta}
-    """
-    else
-    """
+    if [[ ${reference} == 'null' ]]; then
       prokka --gcode ${params.gcode} --cpus ${task.cpus} --outdir ${name} --prefix ${name} ${fasta}
+    else
+      prokka --gcode ${params.gcode} --cpus ${task.cpus} --outdir ${name} --prefix ${name} --proteins ${reference} ${fasta}
+    fi
     """
 }

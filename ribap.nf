@@ -15,8 +15,8 @@ Author: hoelzer.martin@gmail.com
 /* 
 Comment section: First part is a terminal print for additional user information,
 followed by some help statements (e.g. missing input) Second part is file
-channel input. This allows via --list to alter the input of --nano & --illumina
-to add csv instead. name,path   or name,pathR1,pathR2 in case of illumina 
+channel input. This allows via --list to alter the input of --fasta
+to add csv instead. name,path  
 */
 
 // terminal prints
@@ -48,18 +48,31 @@ if (params.fasta && params.list) { fasta_input_ch = Channel
   .fromPath( params.fasta, checkIfExists: true )
   .splitCsv()
   .map { row -> [row[0], file("${row[1]}", checkIfExists: true)] }
-  .view() }
+  //.view() 
+  }
   else if (params.fasta) { fasta_input_ch = Channel
     .fromPath( params.fasta, checkIfExists: true)
     .map { file -> tuple(file.simpleName, file) }
 }
 
-// reference gbk file to improve annotation 
-if (params.reference) { reference_input_ch = Channel
+// reference gbk file to improve annotation & --list support 
+// list support expects something like:
+//
+// genome1,/path/to/ref1.gbk
+// genome2,/path/to/ref1.gbk
+//
+// where the first column matches the basenames of the input genome FASTAs
+if (params.reference && params.list) { reference_input_ch = Channel
+  .fromPath( params.reference, checkIfExists: true )
+  .splitCsv()
+  .map { row -> [row[0], file("${row[1]}", checkIfExists: true)] }
+  //.view() 
+  }
+  else if (params.reference) { reference_input_ch = Channel
     .fromPath( params.reference, checkIfExists: true)
     .map { file -> file }
 } else {
-  reference_input_ch = Channel.value('false')
+  reference_input_ch = Channel.value('null')
 }
 
 
@@ -97,8 +110,17 @@ if (params.tree) {include { raxml } from './modules/raxml'}
 
 workflow {
 
-  prokka(rename(fasta_input_ch).combine(reference_input_ch))
-  
+  renamed_fasta_ch = rename(fasta_input_ch)
+
+  if (params.reference && params.list) {
+    prokka_input_ch = renamed_fasta_ch.join(reference_input_ch, remainder: true).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}.view()
+  } else {
+    // this will either produce a channel w/ [sample_RENAMED, fasta_RENAMED, reference_gbk] OR [sample_RENAMED, fasta_RENAMED, null] 
+    prokka_input_ch = renamed_fasta_ch.combine(reference_input_ch).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}.view()
+  }
+
+  prokka(prokka_input_ch)
+
   gff_ch = prokka.out[0]
   faa_ch = prokka.out[1].collect()
 
@@ -185,7 +207,10 @@ def helpMSG() {
     ${c_yellow}Params:${c_reset}
     --tmlim             Time limit for ILP solve [default: $params.tmlim]
     --gcode             Genetic code for Prokka annotation [default: $params.gcode]
-    --reference         A reference genbank (gbk, gb) file to guide functional annotation via Prokka [defaut: $params.reference]
+    --reference         A reference genbank (gbk, gb) file to guide functional annotation via Prokka.
+                        Attention: when directly provided without the --list parameter, all input genomes 
+                        will be functionally annotated using the same reference. To use different reference files
+                        or to exclude certain genomes from reference-based annotation use the --list option. [defaut: $params.reference]
     --tree              build tree based on the core genome? 
                         Sure thing, We will use RAxML for this. 
                         Be aware, this will take a lot of time. [default: $params.tree]
