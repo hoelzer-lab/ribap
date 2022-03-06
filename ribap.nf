@@ -214,6 +214,7 @@ def helpMSG() {
     --tree              build tree based on the core genome? 
                         Sure thing, We will use RAxML for this. 
                         Be aware, this will take a lot of time. [default: $params.tree]
+    --bootstrap         Bootstrap value for tree building (increases time!). [default $params.bootstrap] 
 
     ${c_yellow}UpSet plot:${c_reset}
     --sets              FASTA simpleNames for genomes that should be 
