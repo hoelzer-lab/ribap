@@ -8,7 +8,7 @@ process rename {
     tuple val(name), file(fasta)
 
   output:
-    tuple val("${name}_RENAMED"), file("*_RENAMED.fasta")
+    tuple val(name), val("${name}_RENAMED"), file("*_RENAMED.fasta")
 
   script:
     """

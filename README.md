@@ -83,24 +83,36 @@ sudo usermod -a -G docker $USER
 
 # Execution examples
 
-Get or update the workflow:
 ```bash
+# Get or update the workflow:
 nextflow pull hoelzer-lab/ribap
-```
 
-Run a specific release:
-```bash
-nextflow run hoelzer-lab/ribap -r 0.6.0
-```
+# Run a specific release.
+# Get newest release version automatically or choose one yourself
+REVISION=$(nextflow info hoelzer-lab/ribap | sed 's/ [*]//' | sed 's/ //g' | sed 's/\[t\]//g' | awk 'BEGIN{FS=" "};{if($0 ~ /^ *0/){print $0}}' | sort -Vr | head -1)
+nextflow run hoelzer-lab/ribap -r $REVISION --help
 
-Get help:
-```bash
-nextflow run hoelzer-lab/ribap --help
-```
+# Run with RAxML tree calculation and specified output dir:
+nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --tree --outdir ~/ribap -w work
 
-Run with RAxML tree calculation and specified output dir:
-```bash
-nextflow run hoelzer-lab/ribap -r 0.6.0 --fasta '*.fasta' --tree --outdir ~/ribap -w work
+# Run with optional reference Genbank file to guide Prokka annotation, ATTENTION: this will use the additional reference file for every input genome!
+nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --reference GCF_000007205.1_ASM720v1_genomic.gbff --outdir ~/ribap -w work
+
+# Use list parameter to provide genome FASTAs and corresponding reference GenBank files in CSV format
+nextflow run hoelzer-lab/ribap -r $REVISION --list --fasta genomes.csv --reference refs.csv --outdir ~/ribap -w work
+
+# genomes.csv:
+#
+# genome1,genome1.fasta
+# genome2,genome2.fasta
+# genome3,genome3.fasta
+
+# refs.csv
+#
+# genome1,ref.gbff
+# genome2,ref.gbff
+# 
+# Here, genome1 and genome2 will additionally use information from ref.gbff in Prokka annotatio while genome3 will be annotated w/o additional reference information
 ```
 
 # Flowchart
