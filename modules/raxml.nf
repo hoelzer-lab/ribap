@@ -2,7 +2,7 @@
 
 process raxml {
   label 'raxml'
-  publishDir "${params.output}/raxml", mode: 'copy', pattern: "*.aa" 
+  publishDir "${params.output}/raxml", mode: 'copy', pattern: "*.support" 
 
   input: 
     file(aln)
