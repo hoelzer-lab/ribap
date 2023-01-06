@@ -13,6 +13,6 @@ process iqtree {
 
   script:
     """
-    iqtree -p ${nexus} -bb 1000 --threads-max ${task.cpus} -nt AUTO -m TEST -pre "\$(basename ${nexus} .nex)"-modeltest
+    iqtree -p ${nexus} -bb ${params.bootstrap} --threads-max ${task.cpus} -nt AUTO -m TEST -pre "\$(basename ${nexus} .nex)"-modeltest
     """
 }
