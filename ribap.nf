@@ -113,10 +113,10 @@ workflow {
   renamed_fasta_ch = rename(fasta_input_ch)
 
   if (params.reference && params.list) {
-    prokka_input_ch = renamed_fasta_ch.join(reference_input_ch, remainder: true).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}.view()
+    prokka_input_ch = renamed_fasta_ch.join(reference_input_ch, remainder: true).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}
   } else {
     // this will either produce a channel w/ [sample_RENAMED, fasta_RENAMED, reference_gbk] OR [sample_RENAMED, fasta_RENAMED, null] 
-    prokka_input_ch = renamed_fasta_ch.combine(reference_input_ch).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}.view()
+    prokka_input_ch = renamed_fasta_ch.combine(reference_input_ch).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}
   }
 
   prokka(prokka_input_ch)

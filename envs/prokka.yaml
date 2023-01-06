@@ -3,4 +3,7 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
+  - python=3.7
   - prokka=1.14.6
+  - blast>=2.10
+  - perl-bio-searchio-hmmer=1.7.3
