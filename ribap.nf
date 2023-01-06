@@ -99,7 +99,12 @@ include { generate_html } from './modules/generate_html'
 include { generate_upsetr_input } from './modules/generate_upsetr_input' 
 include { upsetr } from './modules/upsetr' 
 if (params.sets) {include { upsetr_subset } from './modules/upsetr'}
-if (params.tree) {include { raxml } from './modules/raxml'}
+
+// raxml can be removed later, if iqtree is stable
+if (params.tree) {
+  include { raxml } from './modules/raxml'
+  include { iqtree } from './modules/iqtree'
+  }
 
 
 /************************** 
