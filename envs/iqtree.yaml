@@ -1,0 +1,5 @@
+name: iqtree
+channels:
+  - bioconda
+dependencies:
+  - iqtree==2.2.0.3
