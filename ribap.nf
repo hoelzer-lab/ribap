@@ -103,6 +103,8 @@ if (params.sets) {include { upsetr_subset } from './modules/upsetr'}
 // raxml can be removed later, if iqtree is stable
 if (params.tree) {
   include { raxml } from './modules/raxml'
+  include { filter_alignment } from './modules/filter_alignment'
+  include { nexus_core } from './modules/nexus_core'
   include { iqtree } from './modules/iqtree'
   }
 
@@ -169,8 +171,7 @@ workflow {
     )
   )
 
-  combine_msa(mafft.out.collect(), strain_ids.out)
-
+  //combine_msa(mafft.out.collect(), strain_ids.out)
   build_html_ch = identity_ch.join(combine_roary_ilp.out[0])
   generate_html(build_html_ch, roary.out.collect(), combine_roary_ilp.out[1].collect(), nw_display.out.collect())
 
@@ -178,7 +179,12 @@ workflow {
   upsetr(generate_upsetr_input.out[1])
   if (params.sets) {upsetr_subset(generate_upsetr_input.out[1])}
 
-  if (params.tree) {raxml(combine_msa.out)}
+  //if (params.tree) {raxml(combine_msa.out)}
+  if (params.tree) {
+    filter_alignment(mafft.out.collect().flatten(), strain_ids.out)
+    nexus_core(filter_alignment.out.collect())
+    iqtree(filter_alignment.out.collect(), nexus_core.out)
+  }
 
 }
 
