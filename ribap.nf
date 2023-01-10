@@ -181,7 +181,7 @@ workflow {
 
   //if (params.tree) {raxml(combine_msa.out)}
   if (params.tree) {
-    filter_alignment(mafft.out.collect().flatten(), strain_ids.out)
+    filter_alignment(mafft.out.collect(), strain_ids.out)
     nexus_core(filter_alignment.out.collect())
     // iqtree(filter_alignment.out.collect(), nexus_core.out)
   }
