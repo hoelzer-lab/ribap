@@ -13,11 +13,13 @@ process filter_alignment {
 
   script:
     """
-    NUM=\$(grep -c '>' ${aln})
-    STRAINS=\$(cat ${strain_ids} | wc -l)
-    if [ \$NUM -eq \$STRAINS ]; then
-      cp ${aln} "\$(basename ${aln} .aln)"_core.aln
-    fi
+    for file in ${aln}; do
+      NUM=\$(grep -c '>' \$file)
+      STRAINS=\$(cat ${strain_ids} | wc -l)
+      if [ \$NUM -eq \$STRAINS ]; then
+        cp \${file} "\$(basename \${file} .aln)"_core.aln
+      fi
+    done
     """
 }
 
