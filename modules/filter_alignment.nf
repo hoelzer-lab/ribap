@@ -18,6 +18,7 @@ process filter_alignment {
       STRAINS=\$(cat ${strain_ids} | wc -l)
       if [ \$NUM -eq \$STRAINS ]; then
         cp \${file} "\$(basename \${file} .aln)"_core.aln
+        sed -r -i '/>/ s/_[^_]+\$//' "\$(basename \${file} .aln)"_core.aln
       fi
     done
     """
