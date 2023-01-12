@@ -3,4 +3,5 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
+  - python>=3.7
   - roary=3.13.0
