@@ -1,7 +1,7 @@
 # RIBAP
-Roary ILP Bacterial Annotation Pipeline
+Roary ILP Bacterial Annotation Pipeline.
 
-![](https://img.shields.io/badge/nextflow-21.04.0-brightgreen)
+![](https://img.shields.io/badge/nextflow-22.10.0-brightgreen)
 ![](https://img.shields.io/badge/uses-docker-blue.svg)
 ![](https://img.shields.io/badge/uses-singularity-orange.svg)
 ![](https://img.shields.io/badge/uses-conda-yellow.svg)
@@ -10,28 +10,46 @@ Roary ILP Bacterial Annotation Pipeline
 [![Twitter Follow](https://img.shields.io/twitter/follow/martinhoelzer.svg?style=social)](https://twitter.com/martinhoelzer) 
 [![Twitter Follow](https://img.shields.io/twitter/follow/klamkiewicz.svg?style=social)](https://twitter.com/klamkiewicz) 
 
+1. [ In short ](#short)
+2. [ What is this about? ](#about)
+3. [ How can I give it a try (Quick start)? ](#quick)
+4. [ Execution examples ](#examples)
+5. [ Install ](#install)
+6. [ Publication ](#publication)
+7. [ References ](#references)
 
-**This tool is currently under heavy development, so expect some bugs but feel free to report issues**
+<a name="short"></a>
 
-Annotate your protein sequences with Prokka and determine a pan genome with Roary. This genome is refined with the usage of ILPs that solve the best matching for each pairwise strain mmseqs2 comparison.
+# In short
+Annotate genes in your bacterial genomes with [Prokka](https://github.com/tseemann/prokka) and determine a pangenome with the great [Roary](https://sanger-pathogens.github.io/Roary/). The initial gene clusters found by Roary are further refined with the usage of ILPs that solve the best matching for each pairwise strain [MMseqs2](https://github.com/soedinglab/MMseqs2) comparison.
 
-# What is this about?
-A common task when you have a bunch of bacterial genomes in your hands is the calculation of a _core gene set_. So, we want to know, which genes are homologous and shared between certain bacteria. However, defining homology only based an sequence 
-similarity often underestimates the _true_ core gene set, in particular when diverse species are compared. RIBAP combines sequence homology information from [Roary](https://github.com/sanger-pathogens/Roary) with smart pairwise [ILP](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/) calculations to produce a more complete core gene set - even on genus level. First, RIBAP performs annotations with [Prokka](https://github.com/tseemann/prokka), calculates the core gene set using [Roary](https://github.com/sanger-pathogens/Roary) and pairwise [ILPs](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/), and finally visualizes the results in an interactive HTML table garnished with protein multiple sequence alignments and trees. RIBAP comes with Nextflow and Docker/Conda support for easy execution.      
+<a name="about"></a>
+
+# What?
+A common task when you have a bunch of bacterial genomes in your hands is calculating a _core gene set_ or _pangenome_. So, we want to know, which genes are homologs and shared between a set of bacteria. However, defining homology only based an sequence similarity often underestimates the _true_ core gene set, particularly when diverse species are compared. **RIBAP** combines sequence homology information from [Roary](https://github.com/sanger-pathogens/Roary) with smart pairwise [ILP](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/) calculations to produce a more complete core gene set - even on genus level. First, RIBAP performs annotations with [Prokka](https://github.com/tseemann/prokka), calculates the core gene set using [Roary](https://github.com/sanger-pathogens/Roary) and pairwise [ILPs](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/), and finally visualizes the results in an interactive HTML table garnished with protein multiple sequence alignments and trees. RIBAP comes with [Nextflow](https://nextflow.io) and [Docker](docker.com)/[Singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html)/[Conda](https://docs.conda.io/en/latest/) options to resolve all necessary software dependencies for easy execution.      
+
+![chart](figures/ribap-overview.png)
+
+<a name="quick"></a>
 
 # How can I give it a try?
-Easy, you just need a working `nextflow` and `docker` or `singularity` or `conda` installation, see below! You have `nextflow` and `docker`? Give it a try:
+Glad you're asking. Easy, you just need a working `nextflow` and `docker` or `singularity` or `conda` installation, see below! We recommand the usage of containers! You have `nextflow` and `docker`? Good, give it a try:
+
 ```bash
 nextflow pull hoelzer-lab/ribap
 nextflow info hoelzer-lab/ribap
-# select a release version, e.g. 0.7.0
-nextflow run hoelzer-lab/ribap -r 0.7.0 --fasta "$HOME/.nextflow/assets/hoelzer-lab/ribap/data/*.fasta" -profile local,docker
+# select a release version, e.g. 1.0.0
+nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta "$HOME/.nextflow/assets/hoelzer-lab/ribap/data/*.fasta" -profile local,docker
 ```
-You have `nextflow` and `conda`? Okay:
+
+You have `nextflow` and `conda`? Okay, just change the profile:
 ```bash
-nextflow run hoelzer-lab/ribap -r 0.7.0 --fasta "$HOME/.nextflow/assets/hoelzer-lab/ribap/data/*.fasta" -profile local,conda
+nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta "$HOME/.nextflow/assets/hoelzer-lab/ribap/data/*.fasta" -profile local,conda
 ```
-You need some of this dependencies? Check the end of this README! 
+
+You need some of these dependencies? Check the end of this README! 
+
+<a name="examples"></a>
 
 # Execution examples
 
@@ -42,17 +60,21 @@ nextflow pull hoelzer-lab/ribap
 # Run a specific release, check whats available:
 nextflow info hoelzer-lab/ribap
 
-# Or get newest release version automatically:
+# Or get newest release version automatically and show the help:
 REVISION=$(nextflow info hoelzer-lab/ribap | sed 's/ [*]//' | sed 's/ //g' | sed 's/\[t\]//g' | awk 'BEGIN{FS=" "};{if($0 ~ /^ *0/){print $0}}' | sort -Vr | head -1)
 nextflow run hoelzer-lab/ribap -r $REVISION --help
 
-# Run with RAxML tree calculation and specified output dir:
-nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --tree --outdir ~/ribap -w work
+# Run with IQ-TREE tree calculation using all identified core genes and specified output dir. 
+# Attention: less than 1000 bootstrap replicates (default) can not be used.
+# For intermediate files, a work dir via -w is defined.
+# Note, that Nextflow build-in parameters use a single dash "-" symbol.   
+nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --tree --bootstrap 1000 --outdir ~/ribap -w ribap-work
 
-# Run with optional reference Genbank file to guide Prokka annotation, ATTENTION: this will use the additional reference file for every input genome!
+# Run with optional reference GenBank file to guide Prokka annotation.
+# ATTENTION: this will use the additional reference file for every input genome!
 nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --reference GCF_000007205.1_ASM720v1_genomic.gbff --outdir ~/ribap -w work
 
-# Use list parameter to provide genome FASTAs and corresponding reference GenBank files in CSV format
+# Use list parameter to provide genome FASTAs and corresponding reference GenBank files in CSV format.
 nextflow run hoelzer-lab/ribap -r $REVISION --list --fasta genomes.csv --reference refs.csv --outdir ~/ribap -w work
 
 # genomes.csv:
@@ -66,14 +88,18 @@ nextflow run hoelzer-lab/ribap -r $REVISION --list --fasta genomes.csv --referen
 # genome1,ref.gbff
 # genome2,ref.gbff
 # 
-# Here, genome1 and genome2 will additionally use information from ref.gbff in Prokka annotatio while genome3 will be annotated w/o additional reference information
+# Here, genome1 and genome2 will additionally use information from ref.gbff in Prokka annotation while genome3 will be annotated w/o additional reference information.
 ```
+
+<a name="install"></a>
 
 # Installation
 
 * runs with the workflow manager `nextflow` using `docker` or `singularity` or `conda`
-* this means all programs are automatically pulled via `docker`, `singularity`, or `conda`
-* only `docker` or `sinularity` or `conda` and `nextflow` need to be installed (per default `docker` is used)
+* this means, all programs are automatically pulled via `docker`, `singularity`, or `conda`
+* only `docker` or `sinularity` or `conda` and `nextflow` need to be installed (per default `conda` is used)
+
+**Attention** Use the below installation examples with causion and check you system requirements. Its best to refer to the specific manual of each software. 
 
 ## Nextflow
 Needed in all cases (`conda`, `docker`, `singularity`)
@@ -86,7 +112,7 @@ sudo mv nextflow /bin/
 
 ## Using Conda
 
-Just copy the commands and follow the installation instructions. Let the installer configure `conda` for you. You need to specify `-profile conde` to run the pipeline with conda support.  
+Just copy the commands and follow the installation instructions. Let the installer configure `conda` for you. You need to specify `-profile conda` to run the pipeline with `conda` support. Note, internally the pipeline will switch to `mamba` to faser resolve all environments.   
 ```bash
 cd
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -96,7 +122,6 @@ See [here](https://docs.conda.io/en/latest/miniconda.html) if you need a differe
 
 ## Using Docker
 
-### Easy 
 If you dont have experience with bioinformatic tools just copy the commands into your terminal to set everything up:
 ```bash
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
@@ -105,21 +130,65 @@ sudo usermod -a -G docker $USER
 * restart your computer
 * try out the installation by entering the following
 
-### Experienced
+Docker installation details [here](https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/#install-docker-ce)
 
-**Dependencies**
+<a name="publication"></a>
 
->   * docker (add docker to your Usergroup, so no sudo is needed)
->   * nextflow + java runtime 
->   * git (should be already installed)
->   * wget (should be already installed)
->   * tar (should be already installed)
+# Publication
+If you find RIBAP useful please cite it in your work:
 
-* Docker installation [here](https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/#install-docker-ce)
-* Nextflow installation [here](https://www.nextflow.io/)
-* move or add the nextflow executable to a bin path
-* add docker to your User group via `sudo usermod -a -G docker $USER`
+> Lamkiewicz, K., Barf, LM. & Hölzer, M. (hopefully in 2023!). Pangenome calculation beyond the species level with RIBAP: A comprehensive bacterial core genome annotation pipeline based on Roary and pairwise ILPs
+. In prep!
 
+However, RIBAP would not be possible without the help of many great open source bioinformatics tools. Kudos to all the developers and maintainers! **Please cite them in your work as well!** 
 
-# Flowchart
-![chart](figures/dag.png)
+<a name="references"></a>
+
+# References
+In particular, RIBAP takes advantage of and uses the following tools:
+
+## Roary
+> Page, Andrew J., et al. "Roary: rapid large-scale prokaryote pan genome analysis." Bioinformatics 31.22 (2015): 3691-3693.
+
+[Code](https://sanger-pathogens.github.io/Roary/) | [Publication](https://doi.org/10.1093/bioinformatics/btv421)
+
+## Prokka 
+> Seemann, Torsten. "Prokka: rapid prokaryotic genome annotation." Bioinformatics 30.14 (2014): 2068-2069.
+
+[Code](https://github.com/tseemann/prokka) | [Publication](https://doi.org/10.1093/bioinformatics/btu153)
+
+## MMSeqs2
+
+> Steinegger, Martin, and Johannes Söding. "MMseqs2 enables sensitive protein sequence searching for the analysis of massive data sets." Nature biotechnology 35.11 (2017): 1026-1028.
+
+[Code](https://github.com/soedinglab/MMseqs2) | [Publication](https://www.nature.com/articles/nbt.3988)
+
+## GLPK ILP solver
+
+> Makhorin, Andrew. "GLPK (GNU linear programming kit)." http://www. gnu. org/s/glpk/glpk. html (2008).
+
+* https://www.gnu.org/software/glpk/
+
+## MAFFT
+
+> Katoh, Kazutaka, and Daron M. Standley. "MAFFT multiple sequence alignment software version 7: improvements in performance and usability." Molecular biology and evolution 30.4 (2013): 772-780.
+
+[Code](https://mafft.cbrc.jp/alignment/software/) | [Publication](https://doi.org/10.1093/molbev/mst010)
+
+## FastTree
+
+> Price, Morgan N., Paramvir S. Dehal, and Adam P. Arkin. "FastTree 2 - approximately maximum-likelihood trees for large alignments." PloS one 5.3 (2010): e9490.
+
+[Code](http://www.microbesonline.org/fasttree/) | [Publication](https://doi.org/10.1371/journal.pone.0009490)
+
+## IQ-TREE
+
+> Minh, Bui Quang, et al. "IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era." Molecular biology and evolution 37.5 (2020): 1530-1534.
+
+[Code](https://github.com/iqtree/iqtree2) | [Publication](https://doi.org/10.1093/molbev/msaa015)
+
+## UpSetR
+
+> Conway, Jake R., Alexander Lex, and Nils Gehlenborg. "UpSetR: an R package for the visualization of intersecting sets and their properties." Bioinformatics (2017).
+
+[Code](https://github.com/hms-dbmi/UpSetR) | [Publication](https://doi.org/10.1093/bioinformatics/btx364)
