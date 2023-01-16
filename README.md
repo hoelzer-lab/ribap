@@ -10,20 +10,16 @@ Roary ILP Bacterial Annotation Pipeline.
 [![Twitter Follow](https://img.shields.io/twitter/follow/martinhoelzer.svg?style=social)](https://twitter.com/martinhoelzer) 
 [![Twitter Follow](https://img.shields.io/twitter/follow/klamkiewicz.svg?style=social)](https://twitter.com/klamkiewicz) 
 
-1. [ In short ](#short)
-2. [ What is this about? ](#about)
-3. [ How can I give it a try (Quick start)? ](#quick)
-4. [ Execution examples ](#examples)
-5. [ Install ](#install)
-6. [ Runtime and disk space ](#run)
-7. [ Limitations ](#limitations)
-8. [ Publication ](#publication)
-9. [ References ](#references)
-
-<a name="short"></a>
-
-# In short
 Annotate genes in your bacterial genomes with [Prokka](https://github.com/tseemann/prokka) and determine a pangenome with the great [Roary](https://sanger-pathogens.github.io/Roary/). The initial gene clusters found by Roary are further refined with the usage of ILPs that solve the best matching for each pairwise strain [MMseqs2](https://github.com/soedinglab/MMseqs2) comparison.
+
+1. [ What? ](#about)
+2. [ How can I give it a try (Quick start)? ](#quick)
+3. [ Execution examples ](#examples)
+4. [ Install ](#install)
+5. [ Runtime and disk space ](#run)
+6. [ Limitations ](#limitations)
+7. [ Publication ](#publication)
+8. [ References ](#references)
 
 <a name="about"></a>
 
