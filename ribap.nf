@@ -266,6 +266,8 @@ def helpMSG() {
     --max_cores         max cores used on the machine for local use [default: $params.max_cores]
     --memory            max memory for local use [default: $params.memory]
     --output            name of the result folder [default: $params.output]
+    --deleteILPs        the ILPs take a lot (!) of space. Use this flag to delete them on the fly.
+                        Attention: you can not -resume already calculated ILPs when deleting them. [default: $params.deleteILPs]
 
     ${c_dim}Nextflow options:
     -with-report rep.html    cpu / ram usage (may cause errors)

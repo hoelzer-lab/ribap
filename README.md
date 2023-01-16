@@ -15,8 +15,9 @@ Roary ILP Bacterial Annotation Pipeline.
 3. [ How can I give it a try (Quick start)? ](#quick)
 4. [ Execution examples ](#examples)
 5. [ Install ](#install)
-6. [ Publication ](#publication)
-7. [ References ](#references)
+6. [ Limitations ](#limitations)
+7. [ Publication ](#publication)
+8. [ References ](#references)
 
 <a name="short"></a>
 
@@ -69,6 +70,10 @@ nextflow run hoelzer-lab/ribap -r $REVISION --help
 # For intermediate files, a work dir via -w is defined.
 # Note, that Nextflow build-in parameters use a single dash "-" symbol.   
 nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --tree --bootstrap 1000 --outdir ~/ribap -w ribap-work
+
+# the ILPs can take a lot (!) of space. Use this flag to delete them on the fly.
+# Attention: you can not -resume already calculated ILPs when deleting them.
+nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --outdir ~/ribap -w ribap-work --deleteILPs
 
 # Run with optional reference GenBank file to guide Prokka annotation.
 # ATTENTION: this will use the additional reference file for every input genome!
@@ -131,6 +136,14 @@ sudo usermod -a -G docker $USER
 * try out the installation by entering the following
 
 Docker installation details [here](https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/#install-docker-ce)
+
+<a name="limitations"></a>
+
+# Limitations
+
+* The current version of RIBAP is not intended for use with hundreds of input genomes. You can try, but expect a long runtime and high memory requirements. We recommend running RIBAP with less than 100 input genomes. **Attention** And still then, you will need a lot of disk space to store the ILPs and their results. You can use `--deleteILPs` to remove them on the fly to save memory. However, you cannot then use Nextflow's `-resume` function to resume the ILP processes (but everything else anyway).
+* RIBAP's combination of Roary clusters and ILPs specifically calculates core gene sets for more diverse species. If your input genomes are from the same species, you can also try RIBAP, but you may be better off with tools like [Roary] (https://sanger-pathogens.github.io/Roary/), [Panaroo] (https://github.com/gtonkinhill/panaroo), or [PPanGGOLiN] (https://github.com/labgem/PPanGGOLiN).
+* Currently, we do not classify the final RIBAP groups into pangenome categories, such as core and accessory genomes or persistent/shell/cloud. So RIBAP is very useful to get a good idea of a comprehensive set of core genes for different species, and also of other groups that cover only subsets of the input genomes without calling them "accessory" or "shell"/"cloud." Still, tools like the ones above can help you better classify genes into these categories if needed.
 
 <a name="publication"></a>
 
