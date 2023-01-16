@@ -138,14 +138,20 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 
 # Runtime and disk space
 
-**Attention:** RIBAP is not intended to be used with hundreds or thousands of input genomes (see also [Limitations](#limitations)). Also for smaller input sets, you will need quite some disk space to store the ILPs and their results. You can use `--deleteILPs` to remove them on the fly to save memory. However, then you cannot use Nextflow's `-resume` function to resume the ILP processes (but everything else anyway). Below, we report runtime and disk space usage on a regular Linux laptop using varying numbers of _Chlamydia psittaci_ genomes (~1 Mbp) as input and w/ and w/o the `--deleteILPs` option. 
+**Attention:** RIBAP is not intended to be used with hundreds or thousands of input genomes (see also [Limitations](#limitations)). Also for smaller input sets, you will need quite some disk space to store the ILPs and their results. You can use `--deleteILPs` to remove them on the fly to save memory. However, then you cannot use Nextflow's `-resume` function to resume the ILP processes (but everything else anyway). Below, we report runtime and disk space usage on a regular Linux laptop (8 CPUs used) and a HPC (SLURM, pre-configured CPU and RAM usage) using varying numbers of _Chlamydia psittaci_ genomes (~1 Mbp) as input and w/ and w/o the `--deleteILPs` option. 
 
 | CPUs | #genomes (1 Mbp) | `--deleteILPs` | time | `work` space | `output` space |
 | ----------- | ----------- | ----------- | ----------- |  ----------- |  ----------- |
-| 8   | 8  | NO   | ~25 min | ~17 GB  | ~200 MB |
-| 8   | 8  | YES  | ~28 min | ~1.3 GB | ~200 MB |
-| 8   | 16 | NO  | ~XX | XX  | XXX |
-| 8   | 16 | YES | ~XX | XX  | XXX |
+| 8   | 8  | NO   | ~25 min | **~17 GB**  | ~200 MB |
+| 8   | 8  | YES  | ~28 min | **~1.3 GB** | ~200 MB |
+| 8   | 16 | NO   | ~1 h 23 min | **~65 GB**  | ~406 MB |
+| 8   | 16 | YES  | ~XX min | **~XX GB**  | ~XX MB |
+| HPC   | 8  | NO   | ~XX min | **~XX GB** | ~XX MB |
+| HPC   | 8  | YES  | ~XX min | **~XX GB** | ~XX MB |
+| HPC   | 16 | NO   | ~XX min | **~XX GB**  | ~XX MB |
+| HPC   | 16 | YES  | ~XX min | **~XX GB**  | ~XX MB |
+| HPC   | 32 | NO  | ~XX min | **~XX GB**  | ~XX MB |
+| HPC   | 32 | YES  | ~XX min | **~XX GB**  | ~XX MB |
 
 <a name="limitations"></a>
 
