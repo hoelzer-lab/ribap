@@ -65,6 +65,11 @@ if ( workflow.profile.contains('singularity') ) {
 
 if ( params.bootstrap < 1000 ) { exit 1, "--bootstrap needs to be >=1000 (IQ-TREE -bb parameter requirement for ultra-fast bootstraping)"}
 
+if ( params.deleteILPs ) { 
+    println ""
+    println "\033[0;33mWARNING: ILPs will be deleted on the fly which means you can not -resume them (but other steps of the pipeline).\033[0m"
+}
+
 /************************** 
 * INPUT CHANNELS 
 **************************/
@@ -266,7 +271,7 @@ def helpMSG() {
     --max_cores         max cores used on the machine for local use [default: $params.max_cores]
     --memory            max memory for local use [default: $params.memory]
     --output            name of the result folder [default: $params.output]
-    --deleteILPs        the ILPs take a lot (!) of space. Use this flag to delete them on the fly.
+    --deleteILPs        the ILPs can take a lot (!) of space. Use this flag to delete them on the fly.
                         Attention: you can not -resume already calculated ILPs when deleting them. [default: $params.deleteILPs]
 
     ${c_dim}Nextflow options:
