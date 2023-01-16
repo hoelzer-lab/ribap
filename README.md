@@ -153,6 +153,14 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 | HPC   | 32 | NO  | ~XX min | **~XX GB**  | ~XX MB |
 | HPC   | 32 | YES  | ~XX min | **~XX GB**  | ~XX MB |
 
+Commands used (in slight variations): 
+```bash
+# laptop
+nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' --cores 8 --max_cores 8 -profile local,docker -w work --output ribap-results --deleteILPs
+# HPC
+nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' -profile slurm,singularity -w work --output ribap-results --deleteILPs
+```
+
 <a name="limitations"></a>
 
 # Limitations
