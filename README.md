@@ -15,9 +15,10 @@ Roary ILP Bacterial Annotation Pipeline.
 3. [ How can I give it a try (Quick start)? ](#quick)
 4. [ Execution examples ](#examples)
 5. [ Install ](#install)
-6. [ Limitations ](#limitations)
-7. [ Publication ](#publication)
-8. [ References ](#references)
+6. [ Runtime and disk space ](#run)
+7. [ Limitations ](#limitations)
+8. [ Publication ](#publication)
+9. [ References ](#references)
 
 <a name="short"></a>
 
@@ -137,11 +138,24 @@ sudo usermod -a -G docker $USER
 
 Docker installation details [here](https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/#install-docker-ce)
 
+<a name="run"></a>
+
+# Runtime and disk space
+
+**Attention:** RIBAP is not intended to be used with hundreds or thousands of input genomes (see also [Limitations](#limitations)). Also for smaller input sets, you will need quite some disk space to store the ILPs and their results. You can use `--deleteILPs` to remove them on the fly to save memory. However, then you cannot use Nextflow's `-resume` function to resume the ILP processes (but everything else anyway). Below, we report runtime and disk space usage on a regular Linux laptop using varying numbers of _Chlamydia psittaci_ genomes (~1 Mbp) as input and w/ and w/o the `--deleteILPs` option. 
+
+| `--cores`   | `--max_cores` | # genomes (1 Mbp) | `--deleteILPs` | runtime | `-w work` space | `--output out` space |
+| ----------- | ----------- | ----------- | ----------- | ----------- |  ----------- |  ----------- |
+| 8   | 8 | 8 | NO   | ~25 min | ~17 GB  | ~200 MB |
+| 8   | 8 | 8 | YES  | ~28 min | ~1.3 GB | ~200 MB |
+| 8   | 8 | 16 | NO  | ~XX | XX  | XXX |
+| 8   | 8 | 16 | YES | ~XX | XX  | XXX |
+
 <a name="limitations"></a>
 
 # Limitations
 
-* The current version of RIBAP is not intended for use with hundreds of input genomes. You can try, but expect a long runtime and high memory requirements. We recommend running RIBAP with less than 100 input genomes. **Attention** And still then, you will need a lot of disk space to store the ILPs and their results. You can use `--deleteILPs` to remove them on the fly to save memory. However, you cannot then use Nextflow's `-resume` function to resume the ILP processes (but everything else anyway).
+* The current version of RIBAP is not intended for use with hundreds of input genomes. You can try, but expect a long runtime and high memory requirements (see [Runtime and disk space](#run)). We recommend running RIBAP with less than 100 input genomes and considering the `--deleteILPs` parameter to save space.
 * RIBAP's combination of Roary clusters and ILPs specifically calculates core gene sets for more diverse species. If your input genomes are from the same species, you can also try RIBAP, but you may be better off with tools like [Roary](https://sanger-pathogens.github.io/Roary/), [Panaroo](https://github.com/gtonkinhill/panaroo), or [PPanGGOLiN](https://github.com/labgem/PPanGGOLiN).
 * Currently, we do not classify the final RIBAP groups into pangenome categories, such as core and accessory genomes or persistent/shell/cloud. So RIBAP is very useful to get a good idea of a comprehensive set of core genes for different species, and also of other groups that cover only subsets of the input genomes without calling them "accessory" or "shell"/"cloud." Still, tools like the ones above can help you better classify genes into these categories if needed.
 
