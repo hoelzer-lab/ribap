@@ -28,16 +28,42 @@ println " "
 println "\033[2mCurrent User: $workflow.userName"
 println "Nextflow-version: $nextflow.version"
 println "Starting time: $nextflow.timestamp"
-println "Workdir location:"
-println "  $workflow.workDir\u001B[0m"
+println "Workdir location (intermediate files):"
+println "  $workflow.workDir"
+println "Output dir name:"
+println "  $params.output\u001B[0m"
 println " "
-if (workflow.profile == 'standard') {
-println "\033[2mCPUs to use: $params.cores"
-println "Output dir name: $params.output\u001B[0m"
-println " "}
-
+if (workflow.profile == 'standard' || workflow.profile == 'local') {
+println "\033[2mCPUs to use: $params.cores"}
+if ( workflow.profile.contains('singularity') ) {
+    println "\033[2mSingularity cache directory:"
+    println "  $params.singularityCacheDir\u001B[0m"
+}
+if ( workflow.profile.contains('conda') ) { 
+    println "\033[2mConda cache directory:"
+    println "  $params.condaCacheDir\u001B[0m"
+}
 if (params.profile) { exit 1, "--profile is WRONG use -profile" }
 if (params.fasta == '' ) { exit 1, "input missing, use [--fasta]"}
+
+if ( !workflow.revision ) { 
+    println ""
+    println "\033[0;33mWARNING: Not a stable execution. Please use -r for full reproducibility. Use nextflow info hoelzer-lab/ribap to list release versions.\033[0m"
+}
+
+def folder = new File(params.output)
+if ( folder.exists() ) { 
+    println ""
+    println "\033[0;33mWARNING: Output folder already exists. Results might be overwritten! You can adjust the output folder via [--output]\033[0m"
+}
+
+if ( workflow.profile.contains('singularity') ) {
+    println ""
+    println "\033[0;33mWARNING: Singularity image building sometimes fails!"
+    println "Multiple resumes (-resume) and --max_cores 1 --cores 1 for local execution might help.\033[0m"
+}
+
+if ( params.bootstrap < 1000 ) { exit 1, "--bootstrap needs to be >=1000 (IQ-TREE -bb parameter requirement for ultra-fast bootstraping)"}
 
 /************************** 
 * INPUT CHANNELS 
@@ -204,9 +230,9 @@ def helpMSG() {
     
     RIBAP - Roary ILP Bacterial Annotation Pipeline
 
-    Annotate your protein sequences with Prokka and determine a pan genome with Roary.
-    This genome is refined with the usage of ILPs that solve the best matching for each pairwise
-    strain blastp comparison.
+    Annotate your bacterial genome sequences with Prokka and determine a pangenome with Roary.
+    The Roary gene clusters are further refined with the usage of ILPs that solve the best matching 
+    for each pairwise strain MMSeqs2 comparison.
     
     ${c_yellow}Usage example:${c_reset}
     nextflow run ribap.nf --fasta '../strains/*.fasta' 
@@ -225,7 +251,7 @@ def helpMSG() {
     --tree              build tree based on the core genome? 
                         Sure thing, We will use RAxML for this. 
                         Be aware, this will take a lot of time. [default: $params.tree]
-    --bootstrap         Bootstrap value for tree building (increases time!). [default $params.bootstrap] 
+    --bootstrap         Bootstrap value for tree building (increases time!). Must be >=1000 for IQ-TREE ultra-fast bootstraps [default: $params.bootstrap] 
 
     ${c_yellow}UpSet plot:${c_reset}
     --sets              FASTA simpleNames for genomes that should be 
@@ -249,7 +275,7 @@ def helpMSG() {
     ${c_yellow}Caching:${c_reset}
     --condaCacheDir          Location for storing the conda environments [default: $params.condaCacheDir]
     --singularityCacheDir    Location for storing the singularity images [default: $params.singularityCacheDir]
-    -w                	     Working directory for all intermediate results [default: $params.workDir]
+    -w                	     Working directory for all intermediate results [default: $workflow.workDir]
 
     ${c_yellow}Execution/Engine profiles:${c_reset}
     The pipeline supports profiles to run via different ${c_green}Executers${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}conda${c_reset}
