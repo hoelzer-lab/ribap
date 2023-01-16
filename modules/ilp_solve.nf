@@ -2,7 +2,7 @@
 
 process ilp_solve {
   label 'glpk'
-  publishDir "${params.output}/ilp/", pattern: "solved/*.sol" 
+  //publishDir "${params.output}/ilp/", pattern: "solved/*.sol" 
   publishDir "${params.output}/ilp/simple", pattern: "simple*/*.simple" 
 
 //  there was a problem with multiple use of variable 'x_A1h_A1t', see issue #11
@@ -13,10 +13,13 @@ process ilp_solve {
 
   output:
     path("simple*", type: 'dir')
-    path("solved/*.sol")
+    //path("solved/*.sol")
     path("simple*/*.simple")
 
   script:
+
+    def delete = "${params.deleteILPs}"
+
     """
     # can we use parallel inside a docker? seems so
     mkdir solved
@@ -27,18 +30,17 @@ process ilp_solve {
       sed -E -i '/x_A[^[:space:]]+\$/ N;s/\\n//g' \$SOL
     done
 
-    # this is the succesive version w/o parallel
-#    mkdir solved
-#    for ILP in ilp/*.ilp; do 
-#      BN=\$(basename \$ILP .ilp)
-#      glpsol --lp \$ILP --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim ${params.tmlim} -o solved/\$BN.sol  
-#      sed -E -i '/x_A[^[:space:]]+\$/ N;s/\\n//g' "solved/\$BN.sol"
-#    done
 
     TMP=\$(basename ilp_*)
     mkdir simple_"\$TMP"
     for SOL in solved/*.sol; do
         awk '\$2 ~ /x_A.*_/ && \$4 == 1 {print}' "\$SOL"
     done > simple_"\$TMP"/"${name}".ilp.simple
+    
+    if [[ ${delete} == true ]] ; then 
+      rm -r \$(realpath ${ilp})
+      rm *.ilp # these are just dead links now
+      rm -r solved/
+    fi
     """
 }

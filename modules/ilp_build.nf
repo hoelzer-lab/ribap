@@ -2,7 +2,7 @@
 
 process ilp_build {
   label 'python3'
-  publishDir "${params.output}/ilp/sub_ilps", pattern: "ilp*/*.ilp" 
+  //publishDir "${params.output}/ilp/sub_ilps", pattern: "ilp*/*.ilp" 
 
   input: 
     file(tsv)
