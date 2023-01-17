@@ -24,7 +24,7 @@ process filter_alignment {
     done
 
     for file in *_core.aln; do
-      cdhit -i \$file -o "\$file"_TMP -c 1.0
+      cd-hit -i \$file -o "\$file"_TMP -c 1.0
       RECORDS=\$(grep -c ">" "\$file"_TMP)
       if [ \$RECORDS -ne 1 ]; then
         cp \$file FINAL_\$file
