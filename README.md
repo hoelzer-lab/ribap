@@ -138,20 +138,20 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 
 # Runtime and disk space
 
-**Attention:** RIBAP is not intended to be used with hundreds or thousands of input genomes (see also [Limitations](#limitations)). Also for smaller input sets, you will need quite some disk space to store the ILPs and their results. You can use `--deleteILPs` to remove them on the fly to save memory. However, then you cannot use Nextflow's `-resume` function to resume the ILP processes (but everything else anyway). Below, we report runtime and disk space usage on a regular Linux laptop (8 CPUs used) and a HPC (SLURM, pre-configured CPU and RAM usage) using varying numbers of _Chlamydia psittaci_ genomes (~1 Mbp) as input and w/ and w/o the `--deleteILPs` option. 
+**Attention:** RIBAP is not intended to be used with hundreds or thousands of input genomes (see also [Limitations](#limitations)). Also for smaller input sets, you will need quite some disk space to store the ILPs and their results. You can use `--deleteILPs` to remove them on the fly to save memory. However, then you cannot use Nextflow's `-resume` function to resume the ILP processes (but everything else anyway). Below, we report runtime and disk space usage on a regular Linux laptop (8 CPUs used) and a HPC (SLURM, pre-configured CPU and RAM usage, may have some bias due to HPC load during exeuction) using varying numbers of _Chlamydia psittaci_ genomes (~1 Mbp) as input and w/ and w/o the `--deleteILPs` option. 
 
 | CPUs | #genomes (1 Mbp) | `--deleteILPs` | time | `work` space | `output` space |
 | ----------- | ----------- | ----------- | ----------- |  ----------- |  ----------- |
-| 8   | 8  | NO   | ~25 min | **~17 GB**  | ~200 MB |
-| 8   | 8  | YES  | ~28 min | **~1.3 GB** | ~200 MB |
-| 8   | 16 | NO   | ~1 h 23 min | **~65 GB**  | ~406 MB |
-| 8   | 16 | YES  | ~1 h 20 min | **~2 GB**  | ~406 MB |
-| HPC   | 8  | NO   | ~XX min | **~XX GB** | ~XX MB |
-| HPC   | 8  | YES  | ~XX min | **~XX GB** | ~XX MB |
-| HPC   | 16 | NO   | ~XX min | **~XX GB**  | ~XX MB |
-| HPC   | 16 | YES  | ~XX min | **~XX GB**  | ~XX MB |
-| HPC   | 32 | NO  | ~XX min | **~XX GB**  | ~XX MB |
-| HPC   | 32 | YES  | ~XX min | **~XX GB**  | ~XX MB |
+| 8   | 8  | NO   | 25 min     | **17 GB**  | 200 MB |
+| 8   | 8  | YES  | 28 min     | **1.3 GB** | 200 MB |
+| 8   | 16 | NO   | 1 h 23 min | **65 GB**  | 406 MB |
+| 8   | 16 | YES  | 1 h 20 min | **2 GB**   | 406 MB |
+| HPC | 8  | NO   | 8 min      | **18 GB**  | 200 MB |
+| HPC | 8  | YES  | 11 min     | **1.3 GB** | 200 MB |
+| HPC | 16 | NO   | 17 min     | **71 GB**  | 409 MB |
+| HPC | 16 | YES  | 14 min     | **2.1 GB** | 409 MB |
+| HPC | 32 | NO   | 39 min     | **339 GB** | 825 MB |
+| HPC | 32 | YES  | 40 min     | **4.4 GB** | 825 MB |
 
 Commands used (in slight variations): 
 ```bash
