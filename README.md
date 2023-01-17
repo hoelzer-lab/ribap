@@ -145,7 +145,7 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 | 8   | 8  | NO   | ~25 min | **~17 GB**  | ~200 MB |
 | 8   | 8  | YES  | ~28 min | **~1.3 GB** | ~200 MB |
 | 8   | 16 | NO   | ~1 h 23 min | **~65 GB**  | ~406 MB |
-| 8   | 16 | YES  | ~XX min | **~XX GB**  | ~XX MB |
+| 8   | 16 | YES  | ~1 h 20 min | **~2 GB**  | ~406 MB |
 | HPC   | 8  | NO   | ~XX min | **~XX GB** | ~XX MB |
 | HPC   | 8  | YES  | ~XX min | **~XX GB** | ~XX MB |
 | HPC   | 16 | NO   | ~XX min | **~XX GB**  | ~XX MB |
