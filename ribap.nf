@@ -176,6 +176,8 @@ workflow {
     )
   )
 
+  // select only the 95 combined output file
+  identity_ch = Channel.from(95)
   //copy all *sol and *simple into a solved folder for ilp_solve
   combine_ch = identity_ch
     .join(roary.out)
@@ -189,8 +191,8 @@ workflow {
 
 
 
-  // select only the 95 combined output file
-  identity_ch = Channel.from(95)
+  // // select only the 95 combined output file
+  // identity_ch = Channel.from(95)
   prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), prokka.out[1].map { id, faa -> faa}.collect())
 
   // 50 alignments will be processed one after the other
