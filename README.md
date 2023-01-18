@@ -224,6 +224,12 @@ In particular, RIBAP takes advantage of and uses the following tools:
 
 [Code](http://www.microbesonline.org/fasttree/) | [Publication](https://doi.org/10.1371/journal.pone.0009490)
 
+## cd-hit
+
+> Limin Fu, Beifang Niu, Zhengwei Zhu, Sitao Wu and Weizhong Li. "CD-HIT: accelerated for clustering the next generation sequencing data." Bioinformatics, (2012), 28 (23): 3150-3152
+
+[Code](https://github.com/weizhongli/cdhit) | [Publication](https://academic.oup.com/bioinformatics/article/28/23/3150/192160)
+
 ## IQ-TREE
 
 > Minh, Bui Quang, et al. "IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era." Molecular biology and evolution 37.5 (2020): 1530-1534.
