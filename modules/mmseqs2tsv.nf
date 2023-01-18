@@ -2,7 +2,7 @@
 
 process mmseq2tsv {
   label 'python3'
-  publishDir "${params.output}/blast2tsv", mode: 'copy', pattern: "*.tsv" 
+  publishDir "${params.output}/05-mmseqs2tsv", mode: 'copy', pattern: "*.tsv" 
 
   input: 
     file(mmseqs2)

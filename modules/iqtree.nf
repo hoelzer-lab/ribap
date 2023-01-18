@@ -2,7 +2,7 @@
 
 process iqtree {
   label 'iqtree'
-  publishDir "${params.output}/iqtree", mode: 'copy', pattern: "*modeltest*" 
+  publishDir "${params.output}/13-iqtree", mode: 'copy', pattern: "*modeltest*" 
 
   input: 
     file(aln)

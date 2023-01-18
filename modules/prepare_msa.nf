@@ -3,7 +3,7 @@
 process prepare_msa {
   label 'python3'
   errorStrategy{task.exitStatus=1 ?'ignore':'terminate'}
-  publishDir "${params.output}/msa/", mode: 'copy', pattern: "msa/*.faa" 
+  publishDir "${params.output}/08-msa/", mode: 'copy', pattern: "msa/*.faa" 
 
   input: 
     tuple val(ident), path(holy_ribap_csv)

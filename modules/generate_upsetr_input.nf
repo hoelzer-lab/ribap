@@ -2,8 +2,8 @@
 
 process generate_upsetr_input {
   label 'python3'
-  publishDir "${params.output}/upsetr", mode: 'copy', pattern: "gene_subsets" 
-  publishDir "${params.output}/upsetr", mode: 'copy', pattern: "*_subset.txt" 
+  publishDir "${params.output}/11-upsetr", mode: 'copy', pattern: "gene_subsets" 
+  publishDir "${params.output}/11-upsetr", mode: 'copy', pattern: "*_subset.txt" 
 
   input:
     tuple val(ident), file(holy_table)

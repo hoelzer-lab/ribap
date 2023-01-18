@@ -2,7 +2,7 @@
 
 process rename {
   label 'basics'
-  publishDir "${params.output}/rename", mode: 'copy', pattern: "*_RENAMED.fasta" 
+  publishDir "${params.output}/00-rename", mode: 'copy', pattern: "*_RENAMED.fasta" 
 
   input: 
     tuple val(name), file(fasta)
