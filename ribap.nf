@@ -131,9 +131,7 @@ include { generate_upsetr_input } from './modules/generate_upsetr_input'
 include { upsetr } from './modules/upsetr' 
 if (params.sets) {include { upsetr_subset } from './modules/upsetr'}
 
-// raxml can be removed later, if iqtree is stable
 if (params.tree) {
-  include { raxml } from './modules/raxml'
   include { filter_alignment } from './modules/filter_alignment'
   include { nexus_core } from './modules/nexus_core'
   include { iqtree } from './modules/iqtree'
