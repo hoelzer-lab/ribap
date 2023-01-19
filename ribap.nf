@@ -49,6 +49,7 @@ if (params.fasta == '' ) { exit 1, "input missing, use [--fasta]"}
 if ( !workflow.revision ) { 
     println ""
     println "\033[0;33mWARNING: Not a stable execution. Please use -r for full reproducibility. Use nextflow info hoelzer-lab/ribap to list release versions.\033[0m"
+    println "\033[0;33mIf you cloned the github repository, make sure to use the latest stable release or be aware of potential bugs.\033[0m"
 }
 
 def folder = new File(params.output)
@@ -125,7 +126,7 @@ include { prepare_msa } from './modules/prepare_msa'
 include { mafft } from './modules/mafft' 
 include { fasttree } from './modules/fasttree'
 include { nw_display } from './modules/nw_display' 
-include { combine_msa } from './modules/combine_msa'
+// include { combine_msa } from './modules/combine_msa'
 include { generate_html } from './modules/generate_html'
 include { generate_upsetr_input } from './modules/generate_upsetr_input' 
 include { upsetr } from './modules/upsetr' 
