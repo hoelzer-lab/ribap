@@ -38,7 +38,7 @@ process upsetr {
 
 
 process upsetr_subset {
-      publishDir "${params.output}/upsetr", mode: 'copy', pattern: "upsetr_subset.svg"
+      publishDir "${params.output}/10-upsetr", mode: 'copy', pattern: "upsetr_subset.svg"
       label 'upsetr'
       errorStrategy{task.exitStatus=1 ?'ignore':'terminate'}
 
