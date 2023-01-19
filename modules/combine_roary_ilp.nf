@@ -2,8 +2,8 @@
 
 process combine_roary_ilp {
   label 'python3'
-  publishDir "${params.output}/07-combine", mode: 'copy', pattern: "*.csv" 
-  publishDir "${params.output}/07-combine", mode: 'copy', pattern: "*.txt" 
+  publishDir "${params.output}/06-combine", mode: 'copy', pattern: "*.csv" 
+  publishDir "${params.output}/06-combine", mode: 'copy', pattern: "*.txt" 
 
   input: 
     tuple val(ident), file(roary), file(strain_ids), file(prokka_gff)

@@ -2,8 +2,8 @@
 
 process mmseqs2 {
   label 'mmseqs2'
-  publishDir "${params.output}/04-mmseqs2", mode: 'copy', pattern: "mmseq2_result.csv" 
-  publishDir "${params.output}/04-mmseqs2", mode: 'copy', pattern: "mmseq2_result_filtered.csv" 
+  publishDir "${params.output}/03-mmseqs2", mode: 'copy', pattern: "mmseq2_result.csv" 
+  publishDir "${params.output}/03-mmseqs2", mode: 'copy', pattern: "mmseq2_result_filtered.csv" 
 
   input: 
     file(fasta)

@@ -2,7 +2,7 @@
 
 process mafft {
   label 'mafft'
-  publishDir "${params.output}/09-mafft", mode: 'copy', pattern: "*.aln" 
+  publishDir "${params.output}/08-mafft", mode: 'copy', pattern: "*.aln" 
 
   input: 
     file(faa)

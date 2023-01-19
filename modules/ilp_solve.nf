@@ -3,7 +3,7 @@
 process ilp_solve {
   label 'glpk'
   //publishDir "${params.output}/ilp/", pattern: "solved/*.sol" 
-  publishDir "${params.output}/06-ilp", pattern: "simple*/*.simple" 
+  publishDir "${params.output}/05-ilp", pattern: "simple*/*.simple" 
 
 //  there was a problem with multiple use of variable 'x_A1h_A1t', see issue #11
 //  errorStrategy{task.exitStatus=101 ?'ignore':'terminate'}

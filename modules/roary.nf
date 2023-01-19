@@ -2,7 +2,7 @@
 
 process roary {
   label 'roary'
-  publishDir "${params.output}/03-roary", mode: 'copy', pattern: "${ident}" 
+  publishDir "${params.output}/02-roary", mode: 'copy', pattern: "${ident}" 
 
   input: 
     tuple val(ident), file(gff)

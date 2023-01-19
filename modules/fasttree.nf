@@ -2,7 +2,7 @@
 
 process fasttree {
   label 'fasttree'
-  publishDir "${params.output}/10-fasttree", mode: 'copy', pattern: "*.nwk" 
+  publishDir "${params.output}/09-fasttree", mode: 'copy', pattern: "*.nwk" 
 
   input: 
     file(aln)
