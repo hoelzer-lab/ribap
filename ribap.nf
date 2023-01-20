@@ -84,7 +84,7 @@ if (params.fasta && params.list) { fasta_input_ch = Channel
   }
   else if (params.fasta) { fasta_input_ch = Channel
     .fromPath( params.fasta, checkIfExists: true)
-    .map { file -> tuple(file.simpleName, file) }
+    .map { file -> tuple(file.baseName, file) }
 }
 
 // reference gbk file to improve annotation & --list support 
