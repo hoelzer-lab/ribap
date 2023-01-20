@@ -11,7 +11,6 @@ function rename_fasta_for_prokka {
         IFS=$'\n'
         BN="${FILE%.*}"
         BN="${BN##*/}"
-        BN="${BN//./_}"
         #EXT="${FILE##*.}"
         EXT=fasta
         PREFIX="${BN:0:25}"
