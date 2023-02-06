@@ -2,7 +2,7 @@
 
 process filter_alignment {
   label 'filter_alignment'
-  publishDir "${params.output}/07-msa", pattern: "FINAL*core.aln" 
+  publishDir "${params.output}/08-mafft", pattern: "FINAL*core.aln" 
 
   input: 
     file(aln)
