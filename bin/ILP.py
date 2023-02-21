@@ -24,6 +24,7 @@ __author__ = "Kevin Lamkiewicz"
 from itertools import chain
 import sys
 import re
+import pickle
 
 import networkx as nx
 from networkx.algorithms import bipartite
@@ -61,11 +62,11 @@ class GSGraph(nx.Graph):
 
 class FFProblem():
 
-    def __init__(self, filename):
+    def __init__(self, strains, sims):
         self.G = None
         self.n1 = 0
         self.n2 = 0
-        self._read_ff_file(filename, isolated=True)
+        self._read_ff_file(strains, sims, isolated=True)
 
     def size(self, genome):
         return self.n1 if genome == 0 else self.n2
@@ -74,15 +75,16 @@ class FFProblem():
         g1_nodes = set(n for n, d in self.G.nodes(data=True) if d['bipartite'] == 0)
         return sorted(self.G.degree_iter(g1_nodes), key=itemgetter(1))
 
-    def _read_ff_file(self, filename, isolated=True):
+    def _read_ff_file(self, strains, sims, isolated=True):
         G = GSGraph()
         last = 0
         max_g2 = 0
         g1 = 0  # will store the max g1 at end
-        for l in open(filename):
-            if not l.strip():
-                continue
-            g1, g2, orient, w = l.split()
+        for gene_sim in sims:
+        #for l in open(filename):
+            #if not l.strip():
+                #continue
+            g1, g2, orient, w = gene_sim
             g1 = int(g1)
             g2 = int(g2)
             w = float(w) * int(orient)
@@ -103,12 +105,13 @@ class FFProblem():
 
 class ILPGenerator():
 
-    def __init__(self, tsvFile):
+    def __init__(self, pickled_data, strains):
         
-        self.dirname = '/'.join(tsvFile.split('/')[:-2])
+        self.dirname = '/'.join(pickled_data.split('/')[:-2])
         self.dirname = self.dirname + "/ilp/" if self.dirname else "ilp/"
-        self.basename = tsvFile.split('/')[-1].split('.')[0]
+        self.basename = f"{strains[0]}-vs-{strains[1]}"
         self.out = self.dirname+self.basename 
+
         
         
         
@@ -520,27 +523,24 @@ def parse_arguments(param):
     fix_adj_tolerance = float(param['--fix_adj_tolerance'])
     indel = param['--indel']
 
-    tsvFile=param['<tsv_file>']
+    #tsvFile=param['<tsv_file>']
+    pickled_data=param['<tsv_file>']
 
-    return [tsvFile, s, alpha, matching_size, maximal, fix_adj_tolerance, indel]
+    return [pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel]
 
 if __name__ == '__main__':
 
 
     param = docopt(__doc__)
-    tsvFile, s, alpha, matching_size, maximal, fix_adj_tolerance, indel = parse_arguments(param)
+    pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel = parse_arguments(param)
     #print >> sys.stderr, param
 
+    with open(pickled_data, 'rb') as inputStream:
+        blastTable = pickle.load(inputStream)
+
+    for pairwiseSpecies, similarities in blastTable.items():
     # Read problem
-    P = FFProblem(tsvFile)
-
-    # Filter edges:
-    #print >> sys.stderr, "Filtering edges..."
-    #if param.f > 0:
-    #    ff_graph.filter_edges_from_max_edge(P.G, param.f)
-
-    # print ILP:
-    #print >> sys.stderr, "Generating ILP..."
-    ilpGen = ILPGenerator(tsvFile)
-    ilpGen.generate_lp(P, self_edge_cost=s, alpha=alpha, MATCHING_SIZE=matching_size,
-                MAXIMAL_MATCHING=maximal, tolerance=fix_adj_tolerance, INDEL=indel)
+        P = FFProblem(pairwiseSpecies, similarities)
+        ilpGen = ILPGenerator(pickled_data, pairwiseSpecies)
+        ilpGen.generate_lp(P, self_edge_cost=s, alpha=alpha, MATCHING_SIZE=matching_size,
+                    MAXIMAL_MATCHING=maximal, tolerance=fix_adj_tolerance, INDEL=indel)

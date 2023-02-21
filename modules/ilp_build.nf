@@ -13,17 +13,20 @@ process ilp_build {
   script:
     """
     #parallel -j "${task.cpus}" 'ILP.py --max --indel {} > '"\$PWD"'/{/.}.ilp 2>/dev/null' ::: "\$PWD"/*tsv 2>/dev/null
-    #ILP.py --max --indel ${tsv} > \$(basename ${tsv} .tsv).ilp
     
-    BN=\$(basename ${tsv} .tsv)
+    #BN=\$(basename ${tsv} .pkl)
 
     mkdir ilp
     ILP.py --max --indel ${tsv}
+    for BN in \$(for file in ilp/*ilp; do echo \${file%_*}; done | sort | uniq); do
+      BN=\$(basename \$BN)
+      mkdir ilp_"\${BN}"
+      mv ilp/"\${BN}"*.ilp ilp_"\${BN}" 
+    done
 
-    TMP=\$(basename \$PWD)
-    mv ilp ilp_"\${BN}"
+    rm -r ilp/
 
-    echo \$BN
+    #echo \$BN
     """
 }
 

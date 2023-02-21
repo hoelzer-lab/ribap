@@ -169,12 +169,12 @@ workflow {
 
   mmseqs2(faa_ch)
 
-  mmseqs2tsv(mmseqs2.out[0], strain_ids.out)
-  // ilp_solve(
-  //   ilp_build(
-  //     mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
-  //   )
-  // )
+  // mmseqs2tsv(mmseqs2.out[0], strain_ids.out)
+   ilp_solve(
+    ilp_build(
+      mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
+    )
+  )
   
 
 

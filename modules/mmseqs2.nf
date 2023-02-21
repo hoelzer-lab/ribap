@@ -36,14 +36,14 @@ process mmseqs2 {
 
 process mmseqs2tsv {
   label 'python3'
-  publishDir "${params.output}/04-mmseqs2tsv", mode: 'copy', pattern: "*.tsv" 
+  // publishDir "${params.output}/04-mmseqs2tsv", mode: 'copy', pattern: "*.tsv" 
 
   input: 
     file(mmseqs2)
     file(strain_ids)
 
   output:
-    file("*.tsv")
+    file("*.pkl")
 
   script:
     """

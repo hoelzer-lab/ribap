@@ -84,12 +84,16 @@ with open(blast, 'r') as inputStream:
         #     outputStream.write(f"{queryGene}\t{targetGene}\t{orientation}\t{seqSim}\n")
 
         #key = f"{queryID.split('_')[0]}:{targetID.split('_')[0]}"
-        key = f"{'_'.join(queryID)}:{'_'.join(targetID)}"
+        #key = f"{'_'.join(queryID)}:{'_'.join(targetID)}"
         #stream = outputStreams[key]
         #stream.write(f"{int(queryID.split('_')[1])}\t{int(targetID.split('_')[1])}\t{orientation}\t{seqSim}\n")
         
+        key = (queryStrain, targetStrain)
+
         if key not in blastTable:
-            blastTable[key] = [seqSim, orientation]
+            blastTable[key] = [(queryGene, targetGene, seqSim, orientation)]
+        else:
+            blastTable[key].append((queryGene, targetGene, seqSim, orientation))
 # exit(0)
 #for stream in outputStreams.values():
 #    stream.close()
