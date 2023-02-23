@@ -17,7 +17,7 @@ process combine_roary_ilp {
   script:
     """
     mkdir solved
-    cp simple_*/*.simple solved/
+    cp *.simple solved/
 
     mkdir prokka
     cp *.gff prokka/

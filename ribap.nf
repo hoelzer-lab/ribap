@@ -163,63 +163,63 @@ workflow {
 
   strain_ids(prokka.out[0].collect())
 
-  // identity_ch = Channel.from(60, 70, 80, 90, 95)
-  // roary_run_ch = identity_ch.combine(gff_ch).groupTuple()
-  // roary(roary_run_ch)
+  identity_ch = Channel.from(60, 70, 80, 90, 95)
+  roary_run_ch = identity_ch.combine(gff_ch).groupTuple()
+  roary(roary_run_ch)
 
   mmseqs2(faa_ch)
 
   // mmseqs2tsv(mmseqs2.out[0], strain_ids.out)
-  ilp_solve(
+  // ilp_solve(
     ilp_build(
       mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
     )
+  // )
+  ilp_solve(ilp_build.out[0].flatten())
+
+
+  // select only the 95 combined output file
+  identity_ch = Channel.from(95)
+  //copy all *sol and *simple into a solved folder for ilp_solve
+  combine_ch = identity_ch
+    .join(roary.out)
+    .concat(strain_ids.out)
+    .join(identity_ch
+      .combine(strain_ids.out))
+    .join(identity_ch
+      .combine(gff_ch).groupTuple())
+
+  combine_roary_ilp(combine_ch, ilp_solve.out[0].flatten().toList()) 
+
+
+
+  // // select only the 95 combined output file
+  // identity_ch = Channel.from(95)
+  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), prokka.out[1].map { id, faa -> faa}.collect())
+
+  // 50 alignments will be processed one after the other
+  nw_display(
+    fasttree(
+      mafft(  
+        prepare_msa.out.flatten().buffer(size: 50, remainder: true)
+      )
+    )
   )
-  
 
+  //combine_msa(mafft.out.collect(), strain_ids.out)
+  build_html_ch = identity_ch.join(combine_roary_ilp.out[0])
+  generate_html(build_html_ch, roary.out.collect(), combine_roary_ilp.out[1].collect(), nw_display.out.collect())
 
-//   // select only the 95 combined output file
-//   identity_ch = Channel.from(95)
-//   //copy all *sol and *simple into a solved folder for ilp_solve
-//   combine_ch = identity_ch
-//     .join(roary.out)
-//     .concat(strain_ids.out)
-//     .join(identity_ch
-//       .combine(strain_ids.out))
-//     .join(identity_ch
-//       .combine(gff_ch).groupTuple())
+  generate_upsetr_input(identity_ch.join(combine_roary_ilp.out[0]), strain_ids.out)
+  upsetr(generate_upsetr_input.out[1])
+  if (params.sets) {upsetr_subset(generate_upsetr_input.out[1])}
 
-//   combine_roary_ilp(combine_ch, ilp_solve.out[0].flatten().toList()) 
-
-
-
-//   // // select only the 95 combined output file
-//   // identity_ch = Channel.from(95)
-//   prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), prokka.out[1].map { id, faa -> faa}.collect())
-
-//   // 50 alignments will be processed one after the other
-//   nw_display(
-//     fasttree(
-//       mafft(  
-//         prepare_msa.out.flatten().buffer(size: 50, remainder: true)
-//       )
-//     )
-//   )
-
-//   //combine_msa(mafft.out.collect(), strain_ids.out)
-//   build_html_ch = identity_ch.join(combine_roary_ilp.out[0])
-//   generate_html(build_html_ch, roary.out.collect(), combine_roary_ilp.out[1].collect(), nw_display.out.collect())
-
-//   generate_upsetr_input(identity_ch.join(combine_roary_ilp.out[0]), strain_ids.out)
-//   upsetr(generate_upsetr_input.out[1])
-//   if (params.sets) {upsetr_subset(generate_upsetr_input.out[1])}
-
-//   //if (params.tree) {raxml(combine_msa.out)}
-//   if (params.tree) {
-//     filter_alignment(mafft.out.collect(), strain_ids.out)
-//     nexus_core(filter_alignment.out.collect())
-//     iqtree(filter_alignment.out.collect(), nexus_core.out)
-//   }
+  //if (params.tree) {raxml(combine_msa.out)}
+  if (params.tree) {
+    filter_alignment(mafft.out.collect(), strain_ids.out)
+    nexus_core(filter_alignment.out.collect())
+    iqtree(filter_alignment.out.collect(), nexus_core.out)
+  }
 
 }
 

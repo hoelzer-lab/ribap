@@ -8,7 +8,10 @@ process ilp_build {
     file(tsv)
 
   output:
-    tuple env(BN), path("ilp_*", type: 'dir'), path("ilp_*/*.ilp")
+  // tuple path("ilp_*", type: 'dir'), path("ilp_*/*.ilp")
+  path("ilp_*", type: 'dir')
+  path("ilp_*/*.ilp")
+
 
   script:
     """
