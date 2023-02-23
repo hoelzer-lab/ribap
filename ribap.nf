@@ -163,9 +163,9 @@ workflow {
 
   strain_ids(prokka.out[0].collect())
 
-  // identity_ch = Channel.from(60, 70, 80, 90, 95)
-  // roary_run_ch = identity_ch.combine(gff_ch).groupTuple()
-  // roary(roary_run_ch)
+  identity_ch = Channel.from(60, 70, 80, 90, 95)
+  roary_run_ch = identity_ch.combine(gff_ch).groupTuple()
+  roary(roary_run_ch)
 
   mmseqs2(faa_ch)
 
