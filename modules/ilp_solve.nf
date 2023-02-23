@@ -23,24 +23,22 @@ process ilp_solve {
     """
     # can we use parallel inside a docker? seems so
     mkdir solved
-    #cp ilp_*/*.ilp .
-    ls *.ilp | parallel -j "${task.cpus}" -I% --max-args 1 glpsol --lp % --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim ${params.tmlim} -o solved/%.sol
-    # rm *.ilp
-    for SOL in solved/*.sol; do
-      sed -E -i '/x_A[^[:space:]]+\$/ N;s/\\n//g' \$SOL
-    done
-
+    ls *.ilp | parallel -j "${task.cpus}" -I% --max-args 1 glpsol --lp % --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim ${params.tmlim} -o solved/%.sol \
+                        && if [[ ${delete} == true ]] ; then rm %; fi
 
     TMP=\$(basename ilp_*)
     mkdir simple_"\$TMP"
-    for SOL in solved/*.sol; do
-        awk '\$2 ~ /x_A.*_/ && \$4 == 1 {print}' "\$SOL"
-    done > simple_"\$TMP"/"${name}".ilp.simple
-    
+
     if [[ ${delete} == true ]] ; then 
       rm -r \$(realpath ${ilp})
-      rm *.ilp # these are just dead links now
-      rm -r solved/
     fi
+
+    for SOL in solved/*.sol; do
+      sed -i '/x_A[^[:space:]]+\$/ N;s/\\n//g' \$SOL | awk '\$2 ~ /x_A.*_/ && \$4 == 1 {print}' 
+      if [[ ${delete} == true ]] ; then 
+        rm \$SOL
+      fi
+    done > simple_"\$TMP"/"${name}".ilp.simple
+    
     """
 }
