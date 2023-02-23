@@ -23,8 +23,8 @@ process ilp_solve {
     """
     # can we use parallel inside a docker? seems so
     mkdir solved
-    ls *.ilp | parallel -j "${task.cpus}" --max-args 1 glpsol --lp {} --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim ${params.tmlim} -o solved/{}.sol \
-                        && if [[ ${delete} == true ]] ; then rm {}; fi
+    ls *.ilp | parallel -j "${task.cpus}" --max-args 1 "glpsol --lp {} --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim ${params.tmlim} -o solved/{}.sol \
+                        && if [[ ${delete} == true ]] ; then rm {}; fi"
 
     TMP=\$(basename ilp_*)
     mkdir simple_"\$TMP"
