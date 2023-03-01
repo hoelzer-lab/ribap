@@ -29,13 +29,14 @@ __author__ = "Kevin Lamkiewicz"
 
 from itertools import chain
 import sys
+import os
 import re
 import pickle
 from glob import glob
 
 from collections import defaultdict
 
-from multiprocessing import Pool
+from multiprocessing import Pool, Manager
 import subprocess
 
 import networkx as nx
@@ -48,41 +49,35 @@ from FFProblem import FFProblem
 from ILPBuilder import ILPGenerator
 
 
+
+
 def main():
   """
   Starting point for this script. All functions will be called and coordinated here.
   """
+  global pickled_data
+  global s
+  global alpha
+  global matching_size
+  global maximal
+  global fix_adj_tolerance
+  global indel
+  global cpus
+  global pairwiseSimple
+
   param = docopt(__doc__)
   pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus = parse_arguments(param)
   blastTable = read_blast_table(pickled_data)
-  pairwiseSimple = defaultdict(list)
   
-  #! TODO: Multiprocessing via pool
-  for pairwiseSpecies, similarities in blastTable.items():
-    problem = FFProblem(pairwiseSpecies, similarities)
-    ilpGen = ILPGenerator(pickled_data, pairwiseSpecies)
-    ilpGen.generate_lp(problem, self_edge_cost=s, alpha=alpha, MATCHING_SIZE=matching_size, MAXIMAL_MATCHING=maximal, tolerance=fix_adj_tolerance, INDEL=indel)
-    for ilpFile in glob(f"{ilpGen.out}*ilp"):
-      command = f"glpsol --lp {ilpFile} --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim 240 -o /dev/stdout"
-      process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, universal_newlines=True)
-      stdout,stderr = process.communicate()
-      
-      
-      conditions = []
-      allLine = stdout.split("\n")  
-      for idx,line in enumerate(allLine):   
-        if "x_A" in line:
-          if len(line.split())==2:
-            tmp = line + allLine[idx+1]
-          else:
-            tmp = line
-          conditions.append(tmp)
-          
-      for line in conditions:
-        if line.split()[3] == "1":
-          pairwiseSimple[pairwiseSpecies].append(line)
-          
 
+  manager = Manager()
+  pairwiseSimple = manager.dict()
+
+  #! TODO: Multiprocessing via pool
+  with Pool(cpus) as p:
+    p.map(pool_workload, blastTable.items())
+  
+  write_simple_solutions(pairwiseSimple)
 
 def parse_arguments(param):
     s = float(param['--self'])
@@ -99,9 +94,58 @@ def parse_arguments(param):
 
 
 def read_blast_table(pickled_data):
+  """
+
+  """
+
   with open(pickled_data, 'rb') as inputStream:
     blastTable = pickle.load(inputStream)
   return blastTable
+
+
+def pool_workload(x):
+  """
+
+  """
+  global pairwiseSimple
+  pairwiseSpecies, similarities = x
+  pairwiseSimple[pairwiseSpecies] = []
+  problem = FFProblem(pairwiseSpecies, similarities)
+  ilpGen = ILPGenerator(pickled_data, pairwiseSpecies)
+  ilpGen.generate_lp(problem, self_edge_cost=s, alpha=alpha, MATCHING_SIZE=matching_size, MAXIMAL_MATCHING=maximal, tolerance=fix_adj_tolerance, INDEL=indel)
+  conditions = []
+
+  for ilpFile in glob(f"{ilpGen.out}*ilp"):
+    command = f"glpsol --lp {ilpFile} --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim 240 -o /dev/stdout"
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, universal_newlines=True)
+    stdout,stderr = process.communicate()
+    
+    allLine = stdout.split("\n")  
+    for idx,line in enumerate(allLine):   
+      if "x_A" in line:
+        if len(line.split())==2:
+          tmp = line + allLine[idx+1]
+        else:
+          tmp = line
+        conditions.append(tmp)
+    os.remove(ilpFile)
+
+
+  for line in conditions:
+    if line.split()[3] == "1":      
+      pairwiseSimple[pairwiseSpecies] = pairwiseSimple[pairwiseSpecies] + [line]
+
+
+def write_simple_solutions(pairwiseSimple):
+  """
+
+  """
+  for pairwiseSpecies, simpleRelations in pairwiseSimple.items():
+    with open(f"{pairwiseSpecies[0]}-{pairwiseSpecies[1]}.ilp.simple", 'w') as outputStream:
+    for simpleRelation in simpleRelations:
+      outputStream.write("".join(simpleRelation)+"\n")
+
+
 
 if __name__ == '__main__':
   main()
