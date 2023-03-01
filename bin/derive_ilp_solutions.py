@@ -63,10 +63,11 @@ def main():
   global fix_adj_tolerance
   global indel
   global cpus
+  global tmlim
   global pairwiseSimple
 
   param = docopt(__doc__)
-  pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus = parse_arguments(param)
+  pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus, tmlim = parse_arguments(param)
   blastTable = read_blast_table(pickled_data)
   
 
@@ -89,8 +90,9 @@ def parse_arguments(param):
 
     pickled_data=param['<tsv_file>']
     cpus = int(param['--processes'])
+    tmlim = int(param['--tmlim'])
 
-    return [pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus]
+    return [pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus, tmlim]
 
 
 def read_blast_table(pickled_data):
@@ -116,7 +118,7 @@ def pool_workload(x):
   conditions = []
 
   for ilpFile in glob(f"{ilpGen.out}*ilp"):
-    command = f"glpsol --lp {ilpFile} --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim 240 -o /dev/stdout"
+    command = f"glpsol --lp {ilpFile} --mipgap 0.01 --pcost --cuts --memlim 16834 --tmlim {tmlim} -o /dev/stdout"
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, universal_newlines=True)
     stdout,stderr = process.communicate()
     

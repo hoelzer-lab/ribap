@@ -19,15 +19,15 @@ process ilp_build {
     
     #BN=\$(basename ${tsv} .pkl)
 
-    mkdir ilp
-    ILP.py --max --indel ${tsv}
-    for BN in \$(for file in ilp/*ilp; do echo \${file%_*}; done | sort | uniq); do
-      BN=\$(basename \$BN)
-      mkdir ilp_"\${BN}"
-      mv ilp/"\${BN}"*.ilp ilp_"\${BN}" 
-    done
+    #mkdir ilp
+    derive_ilp_solutions.py -p ${params.cores} --tmlim ${params.tmlim} --max --indel ${tsv}
+    #for BN in \$(for file in ilp/*ilp; do echo \${file%_*}; done | sort | uniq); do
+    #  BN=\$(basename \$BN)
+    #  mkdir ilp_"\${BN}"
+    #  mv ilp/"\${BN}"*.ilp ilp_"\${BN}" 
+    #done
 
-    rm -r ilp/
+    #rm -r ilp/
 
     #echo \$BN
     """
