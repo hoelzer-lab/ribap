@@ -17,8 +17,6 @@ class ILPGenerator():
         self.dirname = self.dirname + "/ilp/" if self.dirname else "ilp/"
         self.basename = f"{strains[0]}-vs-{strains[1]}"
         self.out = self.dirname+self.basename 
-
-        
         
         
     def atoi(self, text):
