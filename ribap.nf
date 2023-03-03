@@ -175,7 +175,7 @@ workflow {
       mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
     )
   // )
-  ilp_solve(ilp_build.out[0].flatten())
+  //  ilp_solve(ilp_build.out[0].flatten())
 
 
   // select only the 95 combined output file
@@ -189,7 +189,7 @@ workflow {
     .join(identity_ch
       .combine(gff_ch).groupTuple())
 
-  combine_roary_ilp(combine_ch, ilp_solve.out[0].flatten().toList()) 
+  combine_roary_ilp(combine_ch, ilp_build.out[0].flatten().toList()) 
 
 
 

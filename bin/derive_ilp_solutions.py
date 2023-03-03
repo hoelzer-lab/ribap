@@ -143,9 +143,9 @@ def write_simple_solutions(pairwiseSimple):
 
   """
   for pairwiseSpecies, simpleRelations in pairwiseSimple.items():
-    with open(f"{pairwiseSpecies[0]}-{pairwiseSpecies[1]}.ilp.simple", 'w') as outputStream:
-    for simpleRelation in simpleRelations:
-      outputStream.write("".join(simpleRelation)+"\n")
+    with open(f"{pairwiseSpecies[0]}-vs-{pairwiseSpecies[1]}.ilp.simple", 'w') as outputStream:
+      for simpleRelation in simpleRelations:
+        outputStream.write("".join(simpleRelation)+"\n")
 
 
 

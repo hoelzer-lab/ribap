@@ -14,7 +14,7 @@ class ILPGenerator():
     def __init__(self, pickled_data, strains):
         
         self.dirname = '/'.join(pickled_data.split('/')[:-2])
-        self.dirname = self.dirname + "/ilp/" if self.dirname else "ilp/"
+        self.dirname = self.dirname if self.dirname else "./"
         self.basename = f"{strains[0]}-vs-{strains[1]}"
         self.out = self.dirname+self.basename 
         

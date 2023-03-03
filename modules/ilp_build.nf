@@ -3,14 +3,16 @@
 process ilp_build {
   label 'python3'
   //publishDir "${params.output}/ilp/sub_ilps", pattern: "ilp*/*.ilp" 
+  publishDir "${params.output}/05-ilp", pattern: "*.ilp.simple" 
 
   input: 
     file(tsv)
 
   output:
   // tuple path("ilp_*", type: 'dir'), path("ilp_*/*.ilp")
-  path("ilp_*", type: 'dir')
-  path("ilp_*/*.ilp")
+// #path("ilp_*", type: 'dir')
+  // path("ilp_*/*.ilp")
+  path("*.ilp.simple")
 
 
   script:
