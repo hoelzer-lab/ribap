@@ -119,8 +119,8 @@ include { prokka } from './modules/prokka'
 include { strain_ids } from './modules/strain_ids' 
 include { roary } from './modules/roary' 
 include { mmseqs2; mmseqs2tsv } from './modules/mmseqs2'
-include { ilp_build } from './modules/ilp_build'
-include { ilp_solve } from './modules/ilp_solve' 
+include { ilp_refinement } from './modules/ilp_refinement'
+// include { ilp_solve } from './modules/ilp_solve' 
 include { combine_roary_ilp } from './modules/combine_roary_ilp'
 include { prepare_msa } from './modules/prepare_msa' 
 include { mafft } from './modules/mafft' 
@@ -145,7 +145,7 @@ if (params.tree) {
 
 /* Comment section: */
 
-workflow {
+workflow RIBAP {
 
   renamed_fasta_ch = rename(fasta_input_ch)
 
@@ -169,13 +169,9 @@ workflow {
 
   mmseqs2(faa_ch)
 
-  // mmseqs2tsv(mmseqs2.out[0], strain_ids.out)
-  // ilp_solve(
-    ilp_build(
+    ilp_refinement(
       mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
     )
-  // )
-  //  ilp_solve(ilp_build.out[0].flatten())
 
 
   // select only the 95 combined output file
@@ -189,7 +185,7 @@ workflow {
     .join(identity_ch
       .combine(gff_ch).groupTuple())
 
-  combine_roary_ilp(combine_ch, ilp_build.out[0].flatten().toList()) 
+  combine_roary_ilp(combine_ch, ilp_refinement.out[0].flatten().toList()) 
 
 
 
@@ -223,7 +219,9 @@ workflow {
 
 }
 
-
+workflow {
+  RIBAP()
+}
 
 /**************************  
 * --help

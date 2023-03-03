@@ -1,6 +1,6 @@
 /*Comment section: */
 
-process ilp_build {
+process ilp_refinement {
   label 'python3' 
   publishDir "${params.output}/05-ilp", pattern: "*.ilp.simple" 
 

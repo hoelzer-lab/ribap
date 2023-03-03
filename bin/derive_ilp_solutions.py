@@ -74,7 +74,6 @@ def main():
   manager = Manager()
   pairwiseSimple = manager.dict()
 
-  #! TODO: Multiprocessing via pool
   with Pool(cpus) as p:
     p.map(pool_workload, blastTable.items())
   
