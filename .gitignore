@@ -7,3 +7,4 @@ work/
 results/
 centrifuge-cloud/
 conda/
+bin/__pycache__
