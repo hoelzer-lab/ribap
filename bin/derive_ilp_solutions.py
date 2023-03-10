@@ -19,7 +19,7 @@ Options:
 
     -p PROCESSES, --processes PROCESSES             Number of processes that are run in parallel to calculate
                                                     and solve ILPs [default: 1]
-    -k, --keep                                      Keeps ILP files. WARNING: This takes a LOT of disk space. [default: False]
+    -k, --keep                                      Keeps ILP files. WARNING: This takes a LOT of disk space.
 
     -t TIME, --tmlim TIME                           Time (in seconds) that is allocated for each individual ILP. [default: 240]
 
@@ -64,10 +64,11 @@ def main():
   global indel
   global cpus
   global tmlim
+  global shes_a_keeper
   global pairwiseSimple
 
   param = docopt(__doc__)
-  pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus, tmlim = parse_arguments(param)
+  pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus, tmlim, shes_a_keeper = parse_arguments(param)
   blastTable = read_blast_table(pickled_data)
   
 
@@ -90,8 +91,9 @@ def parse_arguments(param):
     pickled_data=param['<tsv_file>']
     cpus = int(param['--processes'])
     tmlim = int(param['--tmlim'])
+    shes_a_keeper = param['--keep']
 
-    return [pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus, tmlim]
+    return [pickled_data, s, alpha, matching_size, maximal, fix_adj_tolerance, indel, cpus, tmlim, shes_a_keeper]
 
 
 def read_blast_table(pickled_data):
@@ -129,7 +131,8 @@ def pool_workload(x):
         else:
           tmp = line
         conditions.append(tmp)
-    os.remove(ilpFile)
+    if not shes_a_keeper:
+      os.remove(ilpFile)
 
 
   for line in conditions:

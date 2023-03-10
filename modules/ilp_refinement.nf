@@ -12,8 +12,9 @@ process ilp_refinement {
 
 
   script:
+    def KEEP = params.keepILPs ? "--keep" : ""
     """
-    derive_ilp_solutions.py -p ${params.cores} --tmlim ${params.tmlim} --max --indel ${tsv}
+    derive_ilp_solutions.py -p ${params.cores} --tmlim ${params.tmlim} --max --indel ${tsv} ${KEEP}
     """
 }
 
