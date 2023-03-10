@@ -75,10 +75,13 @@ def main():
   manager = Manager()
   pairwiseSimple = manager.dict()
 
-  with Pool(cpus) as p:
-    p.map(pool_workload, blastTable.items())
+  for pairwiseSpecies, similarities in blastTable.items():
+    pool_workload(pairwiseSpecies, similarities)
+
+  #with Pool(cpus) as p:
+  #  p.map(pool_workload, blastTable.items())
   
-  write_simple_solutions(pairwiseSimple)
+  # write_simple_solutions(pairwiseSimple)
 
 def parse_arguments(param):
     s = float(param['--self'])
@@ -106,13 +109,13 @@ def read_blast_table(pickled_data):
   return blastTable
 
 
-def pool_workload(x):
+def pool_workload(pairwiseSpecies, similarities):
   """
 
   """
-  global pairwiseSimple
-  pairwiseSpecies, similarities = x
-  pairwiseSimple[pairwiseSpecies] = []
+  #global pairwiseSimple
+  #pairwiseSpecies, similarities = x
+  # pairwiseSimple[pairwiseSpecies] = []
   problem = FFProblem(pairwiseSpecies, similarities)
   ilpGen = ILPGenerator(pickled_data, pairwiseSpecies)
   ilpGen.generate_lp(problem, self_edge_cost=s, alpha=alpha, MATCHING_SIZE=matching_size, MAXIMAL_MATCHING=maximal, tolerance=fix_adj_tolerance, INDEL=indel)
@@ -134,20 +137,21 @@ def pool_workload(x):
     if not shes_a_keeper:
       os.remove(ilpFile)
 
+  with open(f"{pairwiseSpecies[0]}-vs-{pairwiseSpecies[1]}.ilp.simple", 'w') as outputStream:
+    for line in conditions:
+      if line.split()[3] == "1":  
+        outputStream.write("".join(line)+"\n")   
+      #pairwiseSimple[pairwiseSpecies] = pairwiseSimple[pairwiseSpecies] + [line]
 
-  for line in conditions:
-    if line.split()[3] == "1":      
-      pairwiseSimple[pairwiseSpecies] = pairwiseSimple[pairwiseSpecies] + [line]
 
+# def write_simple_solutions(pairwiseSimple):
+#   """
 
-def write_simple_solutions(pairwiseSimple):
-  """
-
-  """
-  for pairwiseSpecies, simpleRelations in pairwiseSimple.items():
-    with open(f"{pairwiseSpecies[0]}-vs-{pairwiseSpecies[1]}.ilp.simple", 'w') as outputStream:
-      for simpleRelation in simpleRelations:
-        outputStream.write("".join(simpleRelation)+"\n")
+#   """
+#   for pairwiseSpecies, simpleRelations in pairwiseSimple.items():
+#     with open(f"{pairwiseSpecies[0]}-vs-{pairwiseSpecies[1]}.ilp.simple", 'w') as outputStream:
+#       for simpleRelation in simpleRelations:
+#         outputStream.write("".join(simpleRelation)+"\n")
 
 
 
