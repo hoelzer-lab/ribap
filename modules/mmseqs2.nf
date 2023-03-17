@@ -48,7 +48,7 @@ process mmseqs2tsv {
   script:
     """
     #mkdir tsv
-    mmseq2tsv.py ${mmseqs2} ${strain_ids} . ${params.cores} #tsv 
+    mmseq2tsv.py ${mmseqs2} ${strain_ids} . ${task.cpus} #tsv 
     """
 }
 
