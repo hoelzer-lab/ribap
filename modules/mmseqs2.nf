@@ -35,7 +35,7 @@ process mmseqs2 {
 }
 
 process mmseqs2tsv {
-  label 'python3'
+  label 'python3_heavy_compute'
   // publishDir "${params.output}/04-mmseqs2tsv", mode: 'copy', pattern: "*.tsv" 
 
   input: 
