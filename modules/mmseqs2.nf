@@ -35,7 +35,7 @@ process mmseqs2 {
 }
 
 process mmseqs2tsv {
-  label 'python3_heavy_compute'
+  label 'python3_high_mem'
   // publishDir "${params.output}/04-mmseqs2tsv", mode: 'copy', pattern: "*.tsv" 
 
   input: 
@@ -48,7 +48,7 @@ process mmseqs2tsv {
   script:
     """
     #mkdir tsv
-    mmseq2tsv.py ${mmseqs2} ${strain_ids} . ${task.cpus} #tsv 
+    mmseq2tsv.py ${mmseqs2} ${strain_ids} . ${params.chunks} #tsv 
     """
 }
 

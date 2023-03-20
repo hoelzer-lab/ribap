@@ -66,9 +66,12 @@ if ( workflow.profile.contains('singularity') ) {
 
 if ( params.bootstrap < 1000 ) { exit 1, "--bootstrap needs to be >=1000 (IQ-TREE -bb parameter requirement for ultra-fast bootstraping)"}
 
-if ( params.deleteILPs ) { 
+if ( params.keepILPs ) { 
     println ""
-    println "\033[0;33mWARNING: ILPs will be deleted on the fly which means you can not -resume them (but other steps of the pipeline).\033[0m"
+    println "\033[0;33mWARNING: ILPs will be stored which means you can -resume them. Might take a lot of disk space!\033[0m"
+} else{ 
+    println ""
+    println "\033[0;33mWARNING: ILPs will be deleted which means you can not -resume them (but other steps of the pipeline).\033[0m"
 }
 
 /************************** 
@@ -250,6 +253,7 @@ def helpMSG() {
 
     ${c_yellow}Params:${c_reset}
     --tmlim             Time limit for ILP solve [default: $params.tmlim]
+    --chunks            Split ILPs into $params.chunks chunks for parallel computation [default: $params.chunks]
     --gcode             Genetic code for Prokka annotation [default: $params.gcode]
     --reference         A reference genbank (gbk, gb) file to guide functional annotation via Prokka.
                         Attention: when directly provided without the --list parameter, all input genomes 
@@ -273,8 +277,8 @@ def helpMSG() {
     --max_cores         max cores used on the machine for local use [default: $params.max_cores]
     --memory            max memory for local use [default: $params.memory]
     --output            name of the result folder [default: $params.output]
-    --deleteILPs        the ILPs can take a lot (!) of space. Use this flag to delete them on the fly.
-                        Attention: you can not -resume already calculated ILPs when deleting them. [default: $params.deleteILPs]
+    --keepILPs          the ILPs can take a lot (!) of space. Use this flag to keep them in the work dir if necessary.
+                        Attention: You need to set this flag in order to -resume RIBAP w/o recalulating the ILPs. [default: $params.keepILPs]
 
     ${c_dim}Nextflow options:
     -with-report rep.html    cpu / ram usage (may cause errors)

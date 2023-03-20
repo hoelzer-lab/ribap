@@ -1,7 +1,7 @@
 /*Comment section: */
 
 process ilp_refinement {
-  label 'python3_heavy_compute' 
+  label 'python3' 
   publishDir "${params.output}/05-ilp", pattern: "*.ilp.simple" 
 
   input: 
