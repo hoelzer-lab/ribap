@@ -2,7 +2,7 @@
 
 process nexus_core {
   label 'nexus'
-  publishDir "${params.output}/11-nexus", mode: 'copy', pattern: "core_genome.nex" 
+  publishDir "${params.output}/10-nexus", mode: 'copy', pattern: "core_genome.nex" 
 
   input: 
     file(aln)

@@ -1,5 +1,5 @@
 process upsetr {
-      publishDir "${params.output}/10-upsetr", mode: 'copy', pattern: "upsetr.svg"
+      publishDir "${params.output}/09-upsetr", mode: 'copy', pattern: "upsetr.svg"
       label 'upsetr'
       errorStrategy{task.exitStatus=1 ?'ignore':'terminate'}
 

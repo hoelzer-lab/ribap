@@ -2,7 +2,7 @@
 
 process nw_display {
   label 'newick_utils'
-  publishDir "${params.output}/09-fasttree", mode: 'copy', pattern: "*.svg" 
+  publishDir "${params.output}/08-fasttree", mode: 'copy', pattern: "*.svg" 
 
   input: 
     file(nwk)
