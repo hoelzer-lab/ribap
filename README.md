@@ -137,20 +137,22 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 
 # Runtime and disk space
 
-**Attention:** RIBAP is currently not intended to be used with hundreds or thousands of input genomes (see also [Limitations](#limitations)). Also for smaller input sets, you will need quite some disk space to store the ILPs and their results. Due to that, RIBAP is per default not storing the intermediate ILP files and solutions. You can use `--keepILPs` to store them, if needed. Below, we report runtime and disk space usage on a regular Linux laptop (8 CPUs used) and a HPC (SLURM, pre-configured CPU and RAM usage, runtime may be biased due to HPC work load) using varying numbers of _Chlamydia psittaci_ genomes (~1 Mbp, sampled from [here](https://osf.io/rbca9/)) as input and with and without the `--keepILPs` option. 
+**Attention:** RIBAP is currently not intended to be used with hundreds or thousands of input genomes (see also [Limitations](#limitations)). Also for smaller input sets, you will need quite some disk space to store the ILPs and their results. Due to that, RIBAP is per default not storing the intermediate ILP files and solutions. You can use `--keepILPs` to store them, if needed. Below, we report runtime and disk space usage on a regular Linux laptop (8 CPUs used) and a HPC (SLURM, pre-configured CPU and RAM usage, runtime may be biased due to HPC work load) using varying numbers of _Chlamydia psittaci_ genomes (~1 Mbp, sampled from [here](https://osf.io/rbca9/)) as input and with and without the `--keepILPs` option. Please also not that we used the default `--chunks 8` value. Especially on a HPC, the runtime can be increased drastically by increasing the `--chunks` value. 
 
 | CPUs | #genomes (1 Mbp) | `--keepILPs` | time | `work` space | `output` space |
 | ----------- | ----------- | ----------- | ----------- |  ----------- |  ----------- |
-| 8   | 8  | NO   | 24 min     | **1.2 GB** | 195 MB |  DONE
-| 8   | 8  | YES  | 28 min     | **1.3 GB** | 200 MB |
-| 8   | 16 | NO   | 1 h 23 min | **65 GB**  | 406 MB |  RUNNING
-| 8   | 16 | YES  | 1 h 20 min | **2 GB**   | 406 MB |
-| HPC | 8  | NO   | 6 min      | **1.2 GB** | 196 MB |  DONE
-| HPC | 8  | YES  | 11 min     | **1.3 GB** | 200 MB |
-| HPC | 16 | NO   | 17 min     | **1.5 GB** | 400 MB |  DONE
-| HPC | 16 | YES  | 14 min     | **2.1 GB** | 409 MB |
-| HPC | 32 | NO   | 1 h 1 min  | **2.2 GB** | 794 MB |  DONE
-| HPC | 32 | YES  | 40 min     | **4.4 GB** | 825 MB |  RUNNING
+| 8   | 8  | NO   | 24 min     | **1.2 GB** | 195 MB |
+| 8   | 8  | YES  | 23 min     | **5.5 GB** | 195 MB |
+| 8   | 16 | NO   | 1 h 4 min  | **1.5 GB** | 398 MB |
+| 8   | 16 | YES  | 1 h        | **18 GB**  | 398 MB |
+| 8   | 32 | NO   | x h        | **GB**  | MB |
+| 8   | 32 | YES  | x h        | **GB**  | MB |
+| HPC | 8  | NO   | 6 min      | **1.2 GB** | 196 MB |
+| HPC | 8  | YES  | 6 min      | **5.5 GB** | 196 MB |
+| HPC | 16 | NO   | 17 min     | **1.5 GB** | 400 MB |
+| HPC | 16 | YES  | 16 min     | **21 GB**  | 400 MB |
+| HPC | 32 | NO   | 1 h 1 min  | **2.2 GB** | 794 MB |
+| HPC | 32 | YES  | 1 h 11 min | **83 GB**  | 794 MB |
 
 Commands used (in slight variations): 
 ```bash
@@ -159,8 +161,6 @@ nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' --cores 8 --max_cores 
 # HPC
 nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' -profile slurm,singularity -w work --output ribap-results --keepILPs
 ```
-
-Please note, that especially on a HPC runtime can be increased drastically by increasing the `--chunks` value (default: 8). 
 
 <a name="limitations"></a>
 

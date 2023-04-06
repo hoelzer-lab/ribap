@@ -68,10 +68,10 @@ if ( params.bootstrap < 1000 ) { exit 1, "--bootstrap needs to be >=1000 (IQ-TRE
 
 if ( params.keepILPs ) { 
     println ""
-    println "\033[0;33mWARNING: ILPs will be stored which means you can -resume them. Might take a lot of disk space!\033[0m"
+    println "\033[0;33mWARNING: ILPs will be stored which can take a lot of disk space!\033[0m"
 } else{ 
     println ""
-    println "\033[0;33mWARNING: ILPs will be deleted which means you can not -resume them (but other steps of the pipeline).\033[0m"
+    println "\033[0;33mINFORMATION: ILPs and their intermediate results are deleted to save disk space (use --keepILPs to keep them).\033[0m"
 }
 
 /************************** 
