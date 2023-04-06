@@ -68,9 +68,8 @@ nextflow run hoelzer-lab/ribap -r $REVISION --help
 # Note, that Nextflow build-in parameters use a single dash "-" symbol.   
 nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --tree --bootstrap 1000 --outdir ~/ribap -w ribap-work
 
-# the ILPs can take a lot (!) of space. Use this flag to delete them on the fly.
-# Attention: you can not -resume already calculated ILPs when deleting them.
-nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --outdir ~/ribap -w ribap-work --deleteILPs
+# the ILPs can take a lot (!) of space. But you can use this flag to keep them anyway. Use w/ cuation!
+nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --outdir ~/ribap -w ribap-work --keepILPs
 
 # Run with optional reference GenBank file to guide Prokka annotation.
 # ATTENTION: this will use the additional reference file for every input genome!
@@ -142,30 +141,32 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 
 | CPUs | #genomes (1 Mbp) | `--keepILPs` | time | `work` space | `output` space |
 | ----------- | ----------- | ----------- | ----------- |  ----------- |  ----------- |
-| 8   | 8  | NO   | 25 min     | **17 GB**  | 200 MB |
+| 8   | 8  | NO   | 24 min     | **1.2 GB** | 195 MB |  DONE
 | 8   | 8  | YES  | 28 min     | **1.3 GB** | 200 MB |
-| 8   | 16 | NO   | 1 h 23 min | **65 GB**  | 406 MB |
+| 8   | 16 | NO   | 1 h 23 min | **65 GB**  | 406 MB |  RUNNING
 | 8   | 16 | YES  | 1 h 20 min | **2 GB**   | 406 MB |
-| HPC | 8  | NO   | 8 min      | **18 GB**  | 200 MB |
+| HPC | 8  | NO   | 6 min      | **1.2 GB** | 196 MB |  DONE
 | HPC | 8  | YES  | 11 min     | **1.3 GB** | 200 MB |
-| HPC | 16 | NO   | 17 min     | **71 GB**  | 409 MB |
+| HPC | 16 | NO   | 17 min     | **1.5 GB** | 400 MB |  DONE
 | HPC | 16 | YES  | 14 min     | **2.1 GB** | 409 MB |
-| HPC | 32 | NO   | 39 min     | **339 GB** | 825 MB |
-| HPC | 32 | YES  | 40 min     | **4.4 GB** | 825 MB |
+| HPC | 32 | NO   | 1 h 1 min  | **2.2 GB** | 794 MB |  DONE
+| HPC | 32 | YES  | 40 min     | **4.4 GB** | 825 MB |  RUNNING
 
 Commands used (in slight variations): 
 ```bash
 # laptop
-nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' --cores 8 --max_cores 8 -profile local,docker -w work --output ribap-results <--keepILPs>
+nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' --cores 8 --max_cores 8 -profile local,docker -w work --output ribap-results --keepILPs
 # HPC
-nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' -profile slurm,singularity -w work --output ribap-results <--keepILPs>
+nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' -profile slurm,singularity -w work --output ribap-results --keepILPs
 ```
+
+Please note, that especially on a HPC runtime can be increased drastically by increasing the `--chunks` value (default: 8). 
 
 <a name="limitations"></a>
 
 # Limitations
 
-* The current version of RIBAP is not intended for use with hundreds of input genomes. You can try, but expect a long runtime and high memory requirements (see [Runtime and disk space](#run)). We recommend running RIBAP with less than 100 input genomes and considering the `--deleteILPs` parameter to save space.
+* The current version of RIBAP is not intended for use with hundreds of input genomes. You can try, but expect a long runtime and high memory requirements (see [Runtime and disk space](#run)). We recommend running RIBAP with less than 100 input genomes and without the `--keepILPs` parameter to save space.
 * RIBAP's combination of Roary clusters and ILPs specifically calculates core gene sets for more diverse species. If your input genomes are from the same species, you can also try RIBAP, but you may be better off with tools like [Roary](https://sanger-pathogens.github.io/Roary/), [Panaroo](https://github.com/gtonkinhill/panaroo), or [PPanGGOLiN](https://github.com/labgem/PPanGGOLiN).
 * Currently, we do not classify the final RIBAP groups into pangenome categories, such as core and accessory genomes or persistent/shell/cloud. So RIBAP is very useful to get a good idea of a comprehensive set of core genes for different species, and also of other groups that cover only subsets of the input genomes without calling them "accessory" or "shell"/"cloud." Still, tools like the ones above can help you better classify genes into these categories if needed.
 
