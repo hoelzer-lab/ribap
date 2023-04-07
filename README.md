@@ -141,17 +141,17 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 
 | CPUs | #genomes (1 Mbp) | `--keepILPs` | time | `work` space | `output` space |
 | ----------- | ----------- | ----------- | ----------- |  ----------- |  ----------- |
-| 8   | 8  | NO   | 24 min     | **1.2 GB** | 195 MB |
-| 8   | 8  | YES  | 23 min     | **5.5 GB** | 195 MB |
-| 8   | 16 | NO   | 1 h 4 min  | **1.5 GB** | 398 MB |
+| 8   | 8  | NO   | 24 min     | 1.2 GB     | 195 MB |
+| 8   | 8  | YES  | 23 min     | 5.5 GB     | 195 MB |
+| 8   | 16 | NO   | 1 h 4 min  | 1.5 GB     | 398 MB |
 | 8   | 16 | YES  | 1 h        | **18 GB**  | 398 MB |
-| 8   | 32 | NO   | x h        | **GB**  | MB |
-| 8   | 32 | YES  | x h        | **GB**  | MB |
-| HPC | 8  | NO   | 6 min      | **1.2 GB** | 196 MB |
-| HPC | 8  | YES  | 6 min      | **5.5 GB** | 196 MB |
-| HPC | 16 | NO   | 17 min     | **1.5 GB** | 400 MB |
+| 8   | 32 | NO   | 3 h 10 min | 2.2 GB     | 788 MB |
+| 8   | 32 | YES  | 3 h 16 min | **84 GB**  | 789 MB |
+| HPC | 8  | NO   | 6 min      | 1.2 GB     | 196 MB |
+| HPC | 8  | YES  | 6 min      | 5.5 GB     | 196 MB |
+| HPC | 16 | NO   | 17 min     | 1.5 GB     | 400 MB |
 | HPC | 16 | YES  | 16 min     | **21 GB**  | 400 MB |
-| HPC | 32 | NO   | 1 h 1 min  | **2.2 GB** | 794 MB |
+| HPC | 32 | NO   | 1 h 1 min  | 2.2 GB     | 794 MB |
 | HPC | 32 | YES  | 1 h 11 min | **83 GB**  | 794 MB |
 
 Commands used (in slight variations): 
