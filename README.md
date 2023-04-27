@@ -141,7 +141,7 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 
 RIBAP stores all important output in `--output results`. One of the main output files is an interactive HTML table that summarizes the identified RIBAP groups and can be explored by the user:
 
-<img width="600px" src="https://github.com/hoelzer-lab/ribap/blob/example-data/figures/ribap.gif" /> 
+<img src="https://github.com/hoelzer-lab/ribap/blob/example-data/figures/ribap.gif" /> 
 
 Further output examples for a small [test set](https://github.com/hoelzer-lab/ribap/tree/main/data) composed of five _Chlamydia_ genomes can be found [here](https://github.com/hoelzer-lab/ribap/tree/example-data/data/example-results).
 
