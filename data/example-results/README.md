@@ -12,9 +12,9 @@ The example HTML `html-report/ribap.html` does not link to the individual MSAs a
 
 The `core_genome-modeltest.treefile` Newick tree file was visualized with [iroki](https://www.iroki.net/).
 
-## HTML report snapshot
+## HTML report
 
-![report-snapshot](html-report/ribap-report.png)
+<img src="https://github.com/hoelzer-lab/ribap/blob/example-data/figures/ribap.gif" /> 
 
 ## Tree
 
@@ -24,4 +24,3 @@ The `core_genome-modeltest.treefile` Newick tree file was visualized with [iroki
 
 ![upset](upsetr.png)
 
-<img src="https://github.com/hoelzer-lab/ribap/blob/example-data/figures/ribap.gif" /> 

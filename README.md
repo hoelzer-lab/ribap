@@ -139,7 +139,7 @@ Docker installation details [here](https://docs.docker.com/v17.09/engine/install
 
 # Example output 
 
-RIBAP stores all important output in `--output results`. One of the main output files is an interactive HTML table that summarizes the identified RIBAP groups and can be explored by the user:
+RIBAP stores all important output in `--output results`. Besides CDS annotations, alignments, trees, and the core gene groups one of the main output files is an interactive HTML table that summarizes the identified RIBAP groups and can be explored by the user:
 
 <img src="https://github.com/hoelzer-lab/ribap/blob/example-data/figures/ribap.gif" /> 
 
