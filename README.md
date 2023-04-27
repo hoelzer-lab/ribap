@@ -16,10 +16,11 @@ Annotate genes in your bacterial genomes with [Prokka](https://github.com/tseema
 2. [ How can I give it a try (Quick start)? ](#quick)
 3. [ Execution examples ](#examples)
 4. [ Install ](#install)
-5. [ Runtime and disk space ](#run)
-6. [ Limitations ](#limitations)
-7. [ Publication ](#publication)
-8. [ References ](#references)
+5. [ Example output](#output)
+6. [ Runtime and disk space ](#run)
+7. [ Limitations ](#limitations)
+8. [ Publication ](#publication)
+9. [ References ](#references)
 
 <a name="about"></a>
 
@@ -132,6 +133,18 @@ sudo usermod -a -G docker $USER
 * try out the installation by entering the following
 
 Docker installation details [here](https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/#install-docker-ce)
+
+
+<a name="output"></a>
+
+# Example output 
+
+RIBAP stores all important output in `--output results`. One of the main output files is an interactive HTML table that summarizes the identified RIBAP groups and can be explored by the user:
+
+<img width="600px" src="https://github.com/hoelzer-lab/ribap/blob/example-data/figures/ribap.gif" /> 
+
+Further output examples for a small [test set](https://github.com/hoelzer-lab/ribap/tree/main/data) composed of five _Chlamydia_ genomes can be found [here](https://github.com/hoelzer-lab/ribap/tree/example-data/data/example-results).
+
 
 <a name="run"></a>
 

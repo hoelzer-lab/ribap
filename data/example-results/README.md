@@ -23,3 +23,5 @@ The `core_genome-modeltest.treefile` Newick tree file was visualized with [iroki
 ## UpsetR
 
 ![upset](upsetr.png)
+
+<img width="600px" src="https://github.com/hoelzer-lab/ribap/blob/example-data/figures/ribap.gif" /> 
