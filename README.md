@@ -15,11 +15,12 @@ Annotate genes in your bacterial genomes with [Prokka](https://github.com/tseema
 1. [ What? ](#about)
 2. [ How can I give it a try (Quick start)? ](#quick)
 3. [ Execution examples ](#examples)
-4. [ Install ](#install)
-5. [ Runtime and disk space ](#run)
-6. [ Limitations ](#limitations)
-7. [ Publication ](#publication)
-8. [ References ](#references)
+4. [ Example output](#output)
+5. [ Install ](#install)
+6. [ Runtime and disk space ](#run)
+7. [ Limitations ](#limitations)
+8. [ Publication ](#publication)
+9. [ References ](#references)
 
 <a name="about"></a>
 
@@ -92,6 +93,18 @@ nextflow run hoelzer-lab/ribap -r $REVISION --list --fasta genomes.csv --referen
 # Here, genome1 and genome2 will additionally use information from ref.gbff in Prokka annotation while genome3 will be annotated w/o additional reference information.
 ```
 
+<a name="output"></a>
+
+# Example output 
+
+RIBAP stores all important output in `--output results`. Besides CDS annotations, alignments, trees, and the core gene groups one of the main output files is an interactive HTML table that summarizes the identified RIBAP groups and can be explored by the user:
+
+<img src="https://github.com/hoelzer-lab/ribap/blob/example-data/figures/ribap.gif" /> 
+
+Further output examples for a small [test set](https://github.com/hoelzer-lab/ribap/tree/main/data) composed of five _Chlamydia_ genomes can be found [here](https://github.com/hoelzer-lab/ribap/tree/example-data/data/example-results).
+
+
+
 <a name="install"></a>
 
 # Installation
@@ -132,6 +145,7 @@ sudo usermod -a -G docker $USER
 * try out the installation by entering the following
 
 Docker installation details [here](https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/#install-docker-ce)
+
 
 <a name="run"></a>
 
