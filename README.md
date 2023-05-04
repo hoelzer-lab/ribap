@@ -1,5 +1,5 @@
 # RIBAP
-Roary ILP Bacterial Annotation Pipeline.
+Roary ILP Bacterial core Annotation Pipeline.
 
 ![](https://img.shields.io/badge/nextflow-22.10.0-brightgreen)
 ![](https://img.shields.io/badge/uses-docker-blue.svg)
@@ -12,8 +12,8 @@ Roary ILP Bacterial Annotation Pipeline.
 
 Annotate genes in your bacterial genomes with [Prokka](https://github.com/tseemann/prokka) and determine a pangenome with the great [Roary](https://sanger-pathogens.github.io/Roary/). The initial gene clusters found by Roary are further refined with the usage of ILPs that solve the best matching for each pairwise strain [MMseqs2](https://github.com/soedinglab/MMseqs2) comparison.
 
-1. [ What? ](#about)
-2. [ How can I give it a try (Quick start)? ](#quick)
+1. [ Overview ](#about)
+2. [ Quick start ](#quick)
 3. [ Execution examples ](#examples)
 4. [ Example output](#output)
 5. [ Install ](#install)
@@ -24,15 +24,15 @@ Annotate genes in your bacterial genomes with [Prokka](https://github.com/tseema
 
 <a name="about"></a>
 
-# What?
-A common task when you have a bunch of bacterial genomes in your hands is calculating a _core gene set_ or _pangenome_. So, we want to know, which genes are homologs and shared between a set of bacteria. However, defining homology only based an sequence similarity often underestimates the _true_ core gene set, particularly when diverse species are compared. **RIBAP** combines sequence homology information from [Roary](https://github.com/sanger-pathogens/Roary) with smart pairwise [ILP](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/) calculations to produce a more complete core gene set - even on genus level. First, RIBAP performs annotations with [Prokka](https://github.com/tseemann/prokka), calculates the core gene set using [Roary](https://github.com/sanger-pathogens/Roary) and pairwise [ILPs](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/), and finally visualizes the results in an interactive HTML table garnished with protein multiple sequence alignments and trees. RIBAP comes with [Nextflow](https://nextflow.io) and [Docker](docker.com)/[Singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html)/[Conda](https://docs.conda.io/en/latest/) options to resolve all necessary software dependencies for easy execution.      
+# Overview
+A common task when you have a bunch of bacterial genomes at hand is calculating a _core gene set_ or _pangenome_. We want to know, which genes are homologs and shared between a set of bacteria. However, defining homology only based an sequence similarity often underestimates the _true_ core gene set, particularly when diverse species are compared. **RIBAP** combines sequence homology information from [Roary](https://github.com/sanger-pathogens/Roary) with smart pairwise [ILP](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/) calculations to produce a more complete core gene set - even on genus level. First, **RIBAP** performs annotations with [Prokka](https://github.com/tseemann/prokka), calculates the core gene set using [Roary](https://github.com/sanger-pathogens/Roary) and pairwise [ILPs](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4391664/), and finally visualizes the results in an interactive HTML table garnished with protein multiple sequence alignments and trees. RIBAP comes with [Nextflow](https://nextflow.io) and [Docker](docker.com)/[Singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html)/[Conda](https://docs.conda.io/en/latest/) options to resolve all necessary software dependencies for easy execution.      
 
 ![chart](figures/ribap-overview.png)
 
 <a name="quick"></a>
 
-# How can I give it a try?
-Glad you're asking. Easy, you just need a working `nextflow` and `docker` or `singularity` or `conda` installation, see below! We recommand the usage of containers! You have `nextflow` and `docker`? Good, give it a try:
+# Quick start
+You just need a working `nextflow` and `docker` or `singularity` or `conda` installation, see below! We recommand the usage of containers! You have `nextflow` and `docker`? Give it a try:
 
 ```bash
 nextflow pull hoelzer-lab/ribap
@@ -69,7 +69,7 @@ nextflow run hoelzer-lab/ribap -r $REVISION --help
 # Note, that Nextflow build-in parameters use a single dash "-" symbol.   
 nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --tree --bootstrap 1000 --outdir ~/ribap -w ribap-work
 
-# the ILPs can take a lot (!) of space. But you can use this flag to keep them anyway. Use with caution!
+# The ILPs can take a lot (!) of space. But you can use this flag to keep them anyway. Use with caution!
 nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --outdir ~/ribap -w ribap-work --keepILPs
 
 # Run with optional reference GenBank file to guide Prokka annotation.
