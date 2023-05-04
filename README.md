@@ -69,7 +69,7 @@ nextflow run hoelzer-lab/ribap -r $REVISION --help
 # Note, that Nextflow build-in parameters use a single dash "-" symbol.   
 nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --tree --bootstrap 1000 --outdir ~/ribap -w ribap-work
 
-# the ILPs can take a lot (!) of space. But you can use this flag to keep them anyway. Use w/ cuation!
+# the ILPs can take a lot (!) of space. But you can use this flag to keep them anyway. Use with caution!
 nextflow run hoelzer-lab/ribap -r $REVISION --fasta '*.fasta' --outdir ~/ribap -w ribap-work --keepILPs
 
 # Run with optional reference GenBank file to guide Prokka annotation.
