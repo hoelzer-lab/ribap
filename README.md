@@ -60,7 +60,7 @@ nextflow pull hoelzer-lab/ribap
 nextflow info hoelzer-lab/ribap
 
 # Or get newest release version automatically and show the help:
-REVISION=$(nextflow info hoelzer-lab/ribap | sed 's/ [*]//' | sed 's/ //g' | sed 's/\[t\]//g' | awk 'BEGIN{FS=" "};{if($0 ~ /^ *0/){print $0}}' | sort -Vr | head -1)
+REVISION=$(nextflow info hoelzer-lab/ribap | sed 's/ [*]//' | sed 's/ //g' | sed 's/\[t\]//g' | awk 'BEGIN{FS=" "};{if($0 ~ /^ *[0-9]/){print $0}}' | sort -Vr | head -1)
 nextflow run hoelzer-lab/ribap -r $REVISION --help
 
 # Run with IQ-TREE tree calculation using all identified core genes and specified output dir. 
