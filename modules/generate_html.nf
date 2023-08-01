@@ -18,8 +18,7 @@ process generate_html {
     cp "$baseDir/data/web.tar.gz" .
     #wget https://www.rna.uni-jena.de/supplements/ribap/web.tar.gz
     tar zxvf web.tar.gz
-    gunzip -r web
-
+    
     mkdir tree
     cp *.svg tree/
 
