@@ -23,14 +23,17 @@ process filter_alignment {
       fi
     done
 
-    for file in *_core.aln; do
-      cd-hit -i \$file -o "\$file"_TMP -c 1.0
-      RECORDS=\$(grep -c ">" "\$file"_TMP)
-      if [ \$RECORDS -ne 1 ]; then
-        cp \$file FINAL_\$file
-        sed -r -i '/^[^>]/ s/X/-/g' FINAL_\$file
-      fi      
-    done
+    # it can happen that there is no MSA with all input species!
+    if [ -f *_core.aln ]; then 
+      for file in *_core.aln; do
+        cd-hit -i \$file -o "\$file"_TMP -c 1.0
+        RECORDS=\$(grep -c ">" "\$file"_TMP)
+        if [ \$RECORDS -ne 1 ]; then
+          cp \$file FINAL_\$file
+          sed -r -i '/^[^>]/ s/X/-/g' FINAL_\$file
+        fi      
+      done
+    fi
 
     """
 }
