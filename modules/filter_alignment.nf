@@ -13,10 +13,12 @@ process filter_alignment {
 
   script:
     """
+    CORE_MSA_FOUND=FALSE
     for file in ${aln}; do
       NUM=\$(grep -c '>' \$file)
       STRAINS=\$(cat ${strain_ids} | wc -l)
       if [ \$NUM -eq \$STRAINS ]; then
+        CORE_MSA_FOUND=TRUE
         cp \${file} "\$(basename \${file} .aln)"_core.aln
         sed -r -i '/>/ s/_[^_]+\$//' "\$(basename \${file} .aln)"_core.aln
         sed -r -i '/^[^>]/ s/-/X/g' "\$(basename \${file} .aln)"_core.aln
@@ -24,7 +26,7 @@ process filter_alignment {
     done
 
     # it can happen that there is no MSA with all input species!
-    if [ -f *_core.aln ]; then 
+    if [ $CORE_MSA_FOUND == TRUE ]; then 
       for file in *_core.aln; do
         cd-hit -i \$file -o "\$file"_TMP -c 1.0
         RECORDS=\$(grep -c ">" "\$file"_TMP)
