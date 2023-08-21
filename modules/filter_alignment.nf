@@ -33,7 +33,7 @@ process filter_alignment {
     done
 
     # it can happen that there is no MSA with all input species!
-    if ls ./ | grep '_core.aln'; then
+    if ls ./ | grep '_core.aln' > /dev/null; then    
       for file in *_core.aln; do
         cd-hit -i \$file -o "\$file"_TMP -c 1.0
         RECORDS=\$(grep -c ">" "\$file"_TMP)
