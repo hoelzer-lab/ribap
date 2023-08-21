@@ -16,7 +16,16 @@ process filter_alignment {
     for file in ${aln}; do
       NUM=\$(grep -c '>' \$file)
       STRAINS=\$(cat ${strain_ids} | wc -l)
-      if [ \$NUM -eq \$STRAINS ]; then
+
+      # calculate cutoff for how many species are needed to define a core gene
+      # default is 1.0, but can be lowered by the user
+      t=\$(echo \$STRAINS*$params.core_perc | bc)
+      # round, everything equal or below .5 will be rounded down, otherwise up
+      # printf "%.0f" 26.4 == 26
+      # printf "%.0f" 26.52 == 27
+      STRAINS_CUTOFF=\$(printf "%.0f" \$t)
+
+      if [ \$NUM -ge \$STRAINS_CUTOFF ]; then
         cp \${file} "\$(basename \${file} .aln)"_core.aln
         sed -r -i '/>/ s/_[^_]+\$//' "\$(basename \${file} .aln)"_core.aln
         sed -r -i '/^[^>]/ s/-/X/g' "\$(basename \${file} .aln)"_core.aln
