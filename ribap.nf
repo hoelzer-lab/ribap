@@ -263,6 +263,14 @@ def helpMSG() {
                         Sure thing, We will use RAxML for this. 
                         Be aware, this will take a lot of time. [default: $params.tree]
     --bootstrap         Bootstrap value for tree building (increases time!). Must be >=1000 for IQ-TREE ultra-fast bootstraps [default: $params.bootstrap] 
+    --core_perc         Define how many species are required so that a gene is considered a core gene for tree calculation.
+                        Per default, RIBAP will only consider genes that were found in all input genomes (100%).
+                        However, this can cause tree calculation to stop when there are no such core genes. 
+                        You can lower the threshold to include more homologous genes into the tree caclulation. 
+                        The total input genome number will be multiplied by this value and rounded down when the 
+                        results is <= x.5 (e.g., 28*0.9=25.2 --> 25) and up otherwise (e.g., 28*0.95=26.6 --> 27).
+                        All RIBAP groups that are composed of genes from different species equal or greater this number 
+                        will be considered in the core gene MSA and tree [default: $params.core_perc]
 
     ${c_yellow}UpSet plot:${c_reset}
     --sets              FASTA simpleNames for genomes that should be 
