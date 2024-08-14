@@ -189,7 +189,7 @@ nextflow run hoelzer-lab/ribap -r 1.0.0 --fasta '*.fasta' -profile slurm,singula
 # Publication
 If you find RIBAP useful, please cite it in your work:
 
-> [Lamkiewicz, K., Barf, LM. & Hölzer, M. "RIBAP: a comprehensive bacterial core genome annotation pipeline for pangenome calculation beyond the species level." _Genome Biology_, 25, Article number: 170 (2024)](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-024-03312-9)
+> [Kevin Lamkiewicz, Lisa Marie Barf, Konrad Sachse & Martin Hölzer. "RIBAP: a comprehensive bacterial core genome annotation pipeline for pangenome calculation beyond the species level." _Genome Biology_, 25, 170 (2024)](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-024-03312-9)
 
 However, RIBAP would not have been possible without the help of many great open source bioinformatics tools. Kudos to all the developers and maintainers! **Please cite them in your work as well!** 
 
