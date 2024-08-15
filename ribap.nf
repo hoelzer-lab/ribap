@@ -192,7 +192,7 @@ workflow RIBAP {
   strain_ids(gff_ch.collect())
 
   identity_ch = Channel.from(60, 70, 80, 90, 95)
-  roary_run_ch = identity_ch.combine(gff_ch).groupTuple()
+  roary_run_ch = identity_ch.combine(gff_ch.collect()).groupTuple()
   roary(roary_run_ch)
 
   mmseqs2(faa_ch)
