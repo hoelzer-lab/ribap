@@ -148,6 +148,9 @@ if (params.tree) {
   include { iqtree } from './modules/iqtree'
   }
 
+//if (params.annotation_file && params.protein_fasta_file) include { gff_validate } from './modules/gff_validate'
+
+
 
 /************************** 
 * WORKFLOW ENTRY POINT
@@ -167,16 +170,26 @@ workflow RIBAP {
   }
 
   if (params.annotation_file && params.protein_fasta_file){
-
-    gff_ch = Channel.fromPath(params.annotation_file, checkIfExists: True)
-    faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: True)
+      gff_ch = Channel.fromPath(params.annotation_file, checkIfExists: true)
+    
+    // if we expect multiple .faa files we need a sample sheet for them
+    if (params.list){
+      faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: true)
+                      .splitCsv()
+                      .map { row -> [row[0], file("${row[1]}", checkIfExists: true)] }
+    } else {
+      faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: true)
+                      .combine(renamed_fasta_ch.map{ id, id_renamed, fasta -> id_renamed })
+                      .map { faa, id_renamed -> [id_renamed, faa] }
+    }
   } else {
 
     prokka(prokka_input_ch)
-    gff_ch = prokka.out[0]
-    faa_ch = prokka.out[1].collect()
+    gff_ch = prokka.out[0] // this out puts only .gff  files
+    faa_ch = prokka.out[1].collect() //this outputs [samplename, .faa]
   }
-  strain_ids(prokka.out[0].collect())
+
+  strain_ids(gff_ch.collect())
 
   identity_ch = Channel.from(60, 70, 80, 90, 95)
   roary_run_ch = identity_ch.combine(gff_ch).groupTuple()
@@ -206,7 +219,7 @@ workflow RIBAP {
 
   // // select only the 95 combined output file
   // identity_ch = Channel.from(95)
-  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), prokka.out[1].map { id, faa -> faa}.collect())
+  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), faa_ch.map { id, faa -> faa}.collect())
 
   // 50 alignments will be processed one after the other
   nw_display(
@@ -283,11 +296,12 @@ def helpMSG() {
                           results is <= x.5 (e.g., 28*0.9=25.2 --> 25) and up otherwise (e.g., 28*0.95=26.6 --> 27).
                           All RIBAP groups that are composed of genes from different species equal or greater this number 
                           will be considered in the core gene MSA and tree [default: $params.core_perc]
-    --annotation_file     Custom annotation file in GFF format. This skips the annotation with Prokka and uses your own annotation
+    --annotation_file     Custom annotation file(s) in GFF format. This skips the annotation with Prokka and uses your own annotation
                           file instead. Note that using this flag requires the usage of --protein_fasta_file too. [default: $params.annotation_file] 
     --protein_fasta_file  Fasta file containing the translated amino acid sequences associated with the CDSs from the custom annotation file. 
                           Note that this flag requires the usage of the --annotation_file flag. This will skip the Prokka annotation of the 
-                          workflow and uses your own annotation instead. [default: $params.protein_fasta_file]
+                          workflow and uses your own annotation instead. If --list is set this
+                          expects a CSV file of type 'samplename, path_to_protein_fasta_file'. [default: $params.protein_fasta_file]
 
     ${c_yellow}UpSet plot:${c_reset}
     --sets                FASTA simpleNames for genomes that should be 
