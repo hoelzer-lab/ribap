@@ -74,6 +74,13 @@ if ( params.keepILPs ) {
     println "\033[0;33mINFORMATION: ILPs and their intermediate results are deleted to save disk space (use --keepILPs to keep them).\033[0m"
 }
 
+if (params.annotation_file && !params.protein_fasta_file) {
+    println ""
+    exit 1, "Custom annotation file was found but no associated protein fasta file containing translated CDS was provided. Please provide a protein fasta file using --protein_fasta_file or run without --annotation_file, which will run Prokka annotation as part of the RIBAP workflow."
+} else if (!params.annotation_file && params.protein_fasta_file) {
+    exit 1, "Protein fasta file was found but no associated custom annotation file was provided. Please provide an annotation file in GFF format using --annotation_file or run without --protein_fasta_file, which will run Prokka annotation as part of the RIBAP workflow."
+}
+
 /************************** 
 * INPUT CHANNELS 
 **************************/
@@ -159,11 +166,16 @@ workflow RIBAP {
     prokka_input_ch = renamed_fasta_ch.combine(reference_input_ch).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}
   }
 
-  prokka(prokka_input_ch)
+  if (params.annotation_file && params.protein_fasta_file){
 
-  gff_ch = prokka.out[0]
-  faa_ch = prokka.out[1].collect()
+    gff_ch = Channel.fromPath(params.annotation_file, checkIfExists: True)
+    faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: True)
+  } else {
 
+    prokka(prokka_input_ch)
+    gff_ch = prokka.out[0]
+    faa_ch = prokka.out[1].collect()
+  }
   strain_ids(prokka.out[0].collect())
 
   identity_ch = Channel.from(60, 70, 80, 90, 95)
@@ -172,9 +184,9 @@ workflow RIBAP {
 
   mmseqs2(faa_ch)
 
-    ilp_refinement(
-      mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
-    )
+  ilp_refinement(
+    mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
+  )
 
 
   // select only the 95 combined output file
@@ -252,41 +264,46 @@ def helpMSG() {
     ${c_dim}  ..change above input to csv:${c_reset} ${c_green}--list ${c_reset}            
 
     ${c_yellow}Params:${c_reset}
-    --tmlim             Time limit for ILP solve [default: $params.tmlim]
-    --chunks            Split ILPs into $params.chunks chunks for parallel computation [default: $params.chunks]
-    --gcode             Genetic code for Prokka annotation [default: $params.gcode]
-    --reference         A reference genbank (gbk, gb) file to guide functional annotation via Prokka.
-                        Attention: when directly provided without the --list parameter, all input genomes 
-                        will be functionally annotated using the same reference. To use different reference files
-                        or to exclude certain genomes from reference-based annotation use the --list option. [defaut: $params.reference]
-    --tree              build tree based on the core genome? 
-                        Sure thing, We will use RAxML for this. 
-                        Be aware, this will take a lot of time. [default: $params.tree]
-    --bootstrap         Bootstrap value for tree building (increases time!). Must be >=1000 for IQ-TREE ultra-fast bootstraps [default: $params.bootstrap] 
-    --core_perc         Define how many species are required so that a gene is considered a core gene for tree calculation.
-                        Per default, RIBAP will only consider genes that were found in all input genomes (100%).
-                        However, this can cause tree calculation to stop when there are no such core genes. 
-                        You can lower the threshold to include more homologous genes into the tree caclulation. 
-                        The total input genome number will be multiplied by this value and rounded down when the 
-                        results is <= x.5 (e.g., 28*0.9=25.2 --> 25) and up otherwise (e.g., 28*0.95=26.6 --> 27).
-                        All RIBAP groups that are composed of genes from different species equal or greater this number 
-                        will be considered in the core gene MSA and tree [default: $params.core_perc]
+    --tmlim               Time limit for ILP solve [default: $params.tmlim]
+    --chunks              Split ILPs into $params.chunks chunks for parallel computation [default: $params.chunks]
+    --gcode               Genetic code for Prokka annotation [default: $params.gcode]
+    --reference           A reference genbank (gbk, gb) file to guide functional annotation via Prokka.
+                          Attention: when directly provided without the --list parameter, all input genomes 
+                          will be functionally annotated using the same reference. To use different reference files
+                          or to exclude certain genomes from reference-based annotation use the --list option. [defaut: $params.reference]
+    --tree                build tree based on the core genome? 
+                          Sure thing, We will use RAxML for this. 
+                          Be aware, this will take a lot of time. [default: $params.tree]
+    --bootstrap           Bootstrap value for tree building (increases time!). Must be >=1000 for IQ-TREE ultra-fast bootstraps [default: $params.bootstrap] 
+    --core_perc           Define how many species are required so that a gene is considered a core gene for tree calculation.
+                          Per default, RIBAP will only consider genes that were found in all input genomes (100%).
+                          However, this can cause tree calculation to stop when there are no such core genes.
+                          You can lower the threshold to include more homologous genes into the tree caclulation. 
+                          The total input genome number will be multiplied by this value and rounded down when the 
+                          results is <= x.5 (e.g., 28*0.9=25.2 --> 25) and up otherwise (e.g., 28*0.95=26.6 --> 27).
+                          All RIBAP groups that are composed of genes from different species equal or greater this number 
+                          will be considered in the core gene MSA and tree [default: $params.core_perc]
+    --annotation_file     Custom annotation file in GFF format. This skips the annotation with Prokka and uses your own annotation
+                          file instead. Note that using this flag requires the usage of --protein_fasta_file too. [default: $params.annotation_file] 
+    --protein_fasta_file  Fasta file containing the translated amino acid sequences associated with the CDSs from the custom annotation file. 
+                          Note that this flag requires the usage of the --annotation_file flag. This will skip the Prokka annotation of the 
+                          workflow and uses your own annotation instead. [default: $params.protein_fasta_file]
 
     ${c_yellow}UpSet plot:${c_reset}
-    --sets              FASTA simpleNames for genomes that should be 
-                        used in the UpSet plotting. Needed format:
-                        "\\"Cav\\",\\"Cab\\",\\"Cga\\",\\"Ctr\\"" [default: $params.sets]
-                        ${c_dim}(sorry, this will be simplified someday)${c_reset}
-    --heigth            Height of the plot [default: $params.heigth]
-    --width             Width of the plot [default: $params.width]
+    --sets                FASTA simpleNames for genomes that should be 
+                          used in the UpSet plotting. Needed format:
+                          "\\"Cav\\",\\"Cab\\",\\"Cga\\",\\"Ctr\\"" [default: $params.sets]
+                          ${c_dim}(sorry, this will be simplified someday)${c_reset}
+    --heigth              Height of the plot [default: $params.heigth]
+    --width               Width of the plot [default: $params.width]
 
     ${c_yellow}Compute options:${c_reset}
-    --cores             max cores used per process for local use [default: $params.cores]
-    --max_cores         max cores used on the machine for local use [default: $params.max_cores]
-    --memory            max memory for local use [default: $params.memory]
-    --output            name of the result folder [default: $params.output]
-    --keepILPs          the ILPs can take a lot (!) of space. Use this flag to keep them in the work dir if necessary.
-                        Attention: You need to set this flag in order to -resume RIBAP w/o recalulating the ILPs. [default: $params.keepILPs]
+    --cores               max cores used per process for local use [default: $params.cores]
+    --max_cores           max cores used on the machine for local use [default: $params.max_cores]
+    --memory              max memory for local use [default: $params.memory]
+    --output              name of the result folder [default: $params.output]
+    --keepILPs            the ILPs can take a lot (!) of space. Use this flag to keep them in the work dir if necessary.
+                          Attention: You need to set this flag in order to -resume RIBAP w/o recalulating the ILPs. [default: $params.keepILPs]
 
     ${c_dim}Nextflow options:
     -with-report rep.html    cpu / ram usage (may cause errors)
