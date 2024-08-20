@@ -186,19 +186,20 @@ workflow RIBAP {
 
     prokka(prokka_input_ch)
     gff_ch = prokka.out[0] // this out puts only .gff  files
-    faa_ch = prokka.out[1].collect() //this outputs [samplename, .faa]
+    faa_ch = prokka.out[1].collect().view{ it -> "faa_ch: $it"} //this outputs [samplename, .faa]
   }
 
   strain_ids(gff_ch.collect())
 
   identity_ch = Channel.from(60, 70, 80, 90, 95)
-  roary_run_ch = identity_ch.combine(gff_ch.collect()).groupTuple()
+  roary_run_ch = identity_ch.combine(gff_ch).groupTuple()
   roary(roary_run_ch)
 
   mmseqs2(faa_ch)
+  
 
   ilp_refinement(
-    mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
+    mmseqs2tsv(mmseqs2.out[0].view{ it -> "mmseqs2tsv in: $it"}, strain_ids.out.view{ it -> "strain ids out: $it"}).flatten()
   )
 
 
