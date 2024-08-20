@@ -9,7 +9,7 @@ process prokka {
 
   output:
     file("${name}/${name}.gff")
-    tuple val(name), file("${name}/${name}.faa")
+    file("${name}/${name}.faa")
     path("${name}", type: 'dir')
 
   script:
