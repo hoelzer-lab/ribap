@@ -12,7 +12,7 @@ process strain_ids {
 
   script:
     """
-    for ANNO in *.gff; do
+    for ANNO in *.gff*; do
       BN=\$(basename "\$ANNO" .gff)
       echo \$(grep -vm1 '^#' \$ANNO | awk '{print \$9}' | cut -d'=' -f2 | cut -d'_' -f1),"\$BN"
     done > strain_ids.txt
