@@ -176,17 +176,17 @@ workflow RIBAP {
     if (params.list){
       faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: true)
                       .splitCsv()
-                      .map { row -> [row[0], file("${row[1]}", checkIfExists: true)] }
+                      .map { row -> [ file("${row[1]}", checkIfExists: true)] }
+                      .collect()
     } else {
       faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: true)
-                      .combine(renamed_fasta_ch.map{ id, id_renamed, fasta -> id_renamed })
-                      .map { faa, id_renamed -> [id_renamed, faa] }
+                      .collect()
     }
   } else {
 
     prokka(prokka_input_ch)
     gff_ch = prokka.out[0] // this out puts only .gff  files
-    faa_ch = prokka.out[1].collect().view{ it -> "faa_ch: $it"} //this outputs [samplename, .faa]
+    faa_ch = prokka.out[1].collect() //this outputs [samplename, .faa]
   }
 
   strain_ids(gff_ch.collect())
@@ -199,7 +199,7 @@ workflow RIBAP {
   
 
   ilp_refinement(
-    mmseqs2tsv(mmseqs2.out[0].view{ it -> "mmseqs2tsv in: $it"}, strain_ids.out.view{ it -> "strain ids out: $it"}).flatten()
+    mmseqs2tsv(mmseqs2.out[0], strain_ids.out).flatten()
   )
 
 
@@ -220,7 +220,7 @@ workflow RIBAP {
 
   // // select only the 95 combined output file
   // identity_ch = Channel.from(95)
-  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), faa_ch.map { id, faa -> faa}.collect())
+  prepare_msa(identity_ch.join(combine_roary_ilp.out[0]), faa_ch)
 
   // 50 alignments will be processed one after the other
   nw_display(
