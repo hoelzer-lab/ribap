@@ -170,23 +170,15 @@ workflow RIBAP {
   }
 
   if (params.annotation_file && params.protein_fasta_file){
-      gff_ch = Channel.fromPath(params.annotation_file, checkIfExists: true)
     
-    // if we expect multiple .faa files we need a sample sheet for them
-    if (params.list){
-      faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: true)
-                      .splitCsv()
-                      .map { row -> [ file("${row[1]}", checkIfExists: true)] }
-                      .collect()
-    } else {
+      gff_ch = Channel.fromPath(params.annotation_file, checkIfExists: true)
       faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: true)
                       .collect()
-    }
   } else {
 
     prokka(prokka_input_ch)
-    gff_ch = prokka.out[0] // this out puts only .gff  files
-    faa_ch = prokka.out[1].collect() //this outputs [samplename, .faa]
+    gff_ch = prokka.out[0]
+    faa_ch = prokka.out[1].collect()
   }
 
   strain_ids(gff_ch.collect())
