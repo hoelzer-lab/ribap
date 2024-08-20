@@ -3,7 +3,6 @@
 process roary {
   label 'roary'
   publishDir "${params.output}/02-roary", mode: 'copy', pattern: "${ident}"
-  tag "$gff, $ident"
 
   input: 
     tuple val(ident), file(gff)
