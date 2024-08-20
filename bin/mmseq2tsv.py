@@ -89,7 +89,14 @@ with open(blast, 'r') as inputStream:
         else:
             blastTable[key].append((queryGene, targetGene, seqSim, orientation))
 
-chunksize = int(len(blastTable) / cores)
+if not blastTable:
+    sys.exit('blastTable dictionary is empty, please check mmseqs2 output TSV is not empty and there is at least one queryStrain != targetStrain.')
+
+print(blastTable)
+print(len(blastTable), cores)
+print(len(blastTable) / cores)
+chunksize = int(len(blastTable) / cores) if int(len(blastTable) / cores) >= 1 else 1
+
 
 for idx, item in enumerate(chunks(blastTable, chunksize)):
     with open(f"mmseqs_compressed_chunk{idx}.pkl", 'wb') as f:
