@@ -44,7 +44,7 @@ if ( workflow.profile.contains('conda') ) {
     println "  $params.condaCacheDir\u001B[0m"
 }
 if (params.profile) { exit 1, "--profile is WRONG use -profile" }
-if (params.fasta == '' ) { exit 1, "input missing, use [--fasta]"}
+if (params.fasta == '' && (!params.annotation_file || !params.protein_fasta_file)) { exit 1, "input missing, use [--fasta] or provide [--annotation_file, --protein_fasta_file]"}
 
 if ( !workflow.revision ) { 
     println ""
@@ -78,7 +78,11 @@ if (params.annotation_file && !params.protein_fasta_file) {
     println ""
     exit 1, "Custom annotation file was found but no associated protein fasta file containing translated CDS was provided. Please provide a protein fasta file using --protein_fasta_file or run without --annotation_file, which will run Prokka annotation as part of the RIBAP workflow."
 } else if (!params.annotation_file && params.protein_fasta_file) {
+    println ""
     exit 1, "Protein fasta file was found but no associated custom annotation file was provided. Please provide an annotation file in GFF format using --annotation_file or run without --protein_fasta_file, which will run Prokka annotation as part of the RIBAP workflow."
+} else if (params.annotation_file && params.protein_fasta_file && params.fasta) {
+    println ""
+    println "\033[0;33mINFORMATION: Custom annotation and protein fasta files were provided. Additionally an input fasta file was provided which will be ignored. Skipping Prokka annotation.\033[0m"
 }
 
 /************************** 
@@ -160,14 +164,6 @@ if (params.tree) {
 
 workflow RIBAP {
 
-  renamed_fasta_ch = rename(fasta_input_ch)
-
-  if (params.reference && params.list) {
-    prokka_input_ch = renamed_fasta_ch.join(reference_input_ch, remainder: true).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}
-  } else {
-    // this will either produce a channel w/ [sample_RENAMED, fasta_RENAMED, reference_gbk] OR [sample_RENAMED, fasta_RENAMED, null] 
-    prokka_input_ch = renamed_fasta_ch.combine(reference_input_ch).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}
-  }
 
   if (params.annotation_file && params.protein_fasta_file){
     
@@ -175,6 +171,15 @@ workflow RIBAP {
       faa_ch = Channel.fromPath(params.protein_fasta_file, checkIfExists: true)
                       .collect()
   } else {
+
+    renamed_fasta_ch = rename(fasta_input_ch)
+
+    if (params.reference && params.list) {
+      prokka_input_ch = renamed_fasta_ch.join(reference_input_ch, remainder: true).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}
+    } else {
+      // this will either produce a channel w/ [sample_RENAMED, fasta_RENAMED, reference_gbk] OR [sample_RENAMED, fasta_RENAMED, null] 
+      prokka_input_ch = renamed_fasta_ch.combine(reference_input_ch).map { id, id_renamed, fasta, gbk -> [id_renamed, fasta, gbk]}
+    }
 
     prokka(prokka_input_ch)
     gff_ch = prokka.out[0]
