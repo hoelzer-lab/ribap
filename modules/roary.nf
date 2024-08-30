@@ -2,7 +2,7 @@
 
 process roary {
   label 'roary'
-  publishDir "${params.output}/02-roary", mode: 'copy', pattern: "${ident}" 
+  publishDir "${params.output}/02-roary", mode: 'copy', pattern: "${ident}"
 
   input: 
     tuple val(ident), file(gff)
@@ -12,7 +12,7 @@ process roary {
 
   script:
     """
-    roary -e --mafft -p ${task.cpus} -v -i ${ident} -r *.gff -f "${ident}" &> ribap_roary_"${ident}".log
+    roary -e --mafft -p ${task.cpus} -v -i ${ident} -r *.gff* -f "${ident}" &> ribap_roary_"${ident}".log
     """
 }
 
