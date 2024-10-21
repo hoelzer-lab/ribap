@@ -300,6 +300,9 @@ def helpMSG() {
                           Note that this flag requires the usage of the --annotation_file flag. This will skip the Prokka annotation of the 
                           workflow and uses your own annotation instead. If --list is set this
                           expects a CSV file of type 'samplename, path_to_protein_fasta_file'. [default: $params.protein_fasta_file]
+    --set_recursion_limit In case of a "RecursionError: maximum recursion depth exceeded in comparison" error, you can try to increase the 
+                          recursion limit of Python when combining the ILP and roary results. ATTENTION: only do this when you can closely 
+                          monitor the resources on your system and you know what you are doing! [default: $params.set_recursion_limit]
 
     ${c_yellow}UpSet plot:${c_reset}
     --sets                FASTA simpleNames for genomes that should be 
