@@ -23,6 +23,7 @@ process combine_roary_ilp {
     cp *.gff prokka/
 
     # setrecursionlimit see: https://github.com/hoelzer-lab/ribap/issues/66
+    cp "$baseDir/bin/combine_roary_ilp.py" .
     python -c "import sys;sys.setrecursionlimit(${params.set_recursion_limit});exec(open('combine_roary_ilp.py').read())" ${strain_ids} ${ident}/gene_presence_absence.csv solved/ holy_python_ribap_"${ident}".csv ${ident} > ribap_roary"${ident}"_summary.txt
     """
 }
