@@ -211,7 +211,7 @@ workflow RIBAP {
     .join(identity_ch
       .combine(gff_ch).groupTuple())
 
-  // we copy the script in the process to execute python in a special way. We copy it in due to https://github.com/hoelzer-lab/ribap/issues/67
+  // we copy the script in the process to execute python in a special way. We copy it in due to https://github.com/hoelzer-lab/ribap/issues/66
   combine_roary_ilp_script = Channel.fromPath( workflow.projectDir + '/bin/combine_roary_ilp.py', checkIfExists: true )
   combine_roary_ilp(combine_ch, ilp_refinement.out[0].flatten().toList(), combine_roary_ilp_script) 
 

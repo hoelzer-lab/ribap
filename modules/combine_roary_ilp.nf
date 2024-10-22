@@ -6,14 +6,14 @@ process combine_roary_ilp {
   publishDir "${params.output}/05-combine", mode: 'copy', pattern: "*.txt" 
 
   input: 
-    tuple val(ident), file(roary), file(strain_ids), file(prokka_gff)
-    file(solved_ilps)
-    file(script)
+    tuple val(ident), path(roary), path(strain_ids), path(prokka_gff)
+    path(solved_ilps)
+    path(script)
 
   output:
-    tuple val(ident), file("holy*.csv")
-    tuple val(ident), file("ribap*.csv")
-    tuple val(ident), file("*.txt")
+    tuple val(ident), path("holy*.csv")
+    tuple val(ident), path("ribap*.csv")
+    tuple val(ident), path("*.txt")
 
   script:
     """
@@ -24,7 +24,7 @@ process combine_roary_ilp {
     cp *.gff prokka/
 
     # copy the py script to execute it here with the extended command. 
-    # However this might fail if baseDir can not be reached from the container.
+    # However this might fail if baseDir can not be reached from the (singularity) container.
     # If so, download the script from GitHub as a fallback.
     #if cp "$baseDir/bin/combine_roary_ilp.py" .; then
     #  echo "Script copied successfully."
