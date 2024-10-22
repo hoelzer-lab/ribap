@@ -15,8 +15,18 @@ process generate_html {
 
   script:
     """
-    cp "$baseDir/data/web.tar.gz" .
-    #wget https://www.rna.uni-jena.de/supplements/ribap/web.tar.gz
+    # Try to copy the file
+    if cp "$baseDir/data/web.tar.gz" .; then
+      echo "File copied successfully."
+    else
+      # the command might fail when singularity is used, see: https://github.com/hoelzer-lab/ribap/issues/67
+      echo "File copy failed. Attempting to download the file..."
+      if wget --no-check-certificate https://osf.io/fcyjn/download -O web.tar.gz; then
+        echo "File downloaded successfully."
+      else
+        echo "File download failed."
+      fi
+    fi
     tar zxvf web.tar.gz
     
     mkdir tree
