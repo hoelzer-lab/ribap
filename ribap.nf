@@ -211,9 +211,9 @@ workflow RIBAP {
     .join(identity_ch
       .combine(gff_ch).groupTuple())
 
-  combine_roary_ilp(combine_ch, ilp_refinement.out[0].flatten().toList()) 
-
-
+  // we copy the script in the process to execute python in a special way. We copy it in due to https://github.com/hoelzer-lab/ribap/issues/67
+  combine_roary_ilp_script = Channel.fromPath( workflow.projectDir + '/bin/combine_roary_ilp.py', checkIfExists: true )
+  combine_roary_ilp(combine_ch, ilp_refinement.out[0].flatten().toList(), combine_roary_ilp_script) 
 
   // // select only the 95 combined output file
   // identity_ch = Channel.from(95)
@@ -230,7 +230,10 @@ workflow RIBAP {
 
   //combine_msa(mafft.out.collect(), strain_ids.out)
   build_html_ch = identity_ch.join(combine_roary_ilp.out[0])
-  generate_html(build_html_ch, roary.out.collect(), combine_roary_ilp.out[1].collect(), nw_display.out.collect())
+  // get the web.tar.gz path bc since nf v23 mounting of the home dir in containers (singularity) is not possible per default
+  // see: https://github.com/hoelzer-lab/ribap/issues/67
+  web_dir = Channel.fromPath( workflow.projectDir + '/data/web.tar.gz', checkIfExists: true )
+  generate_html(build_html_ch, roary.out.collect(), combine_roary_ilp.out[1].collect(), nw_display.out.collect(), web_dir)
 
   generate_upsetr_input(identity_ch.join(combine_roary_ilp.out[0]), strain_ids.out)
   upsetr(generate_upsetr_input.out[1])

@@ -21,6 +21,7 @@ Annotate genes in your bacterial genomes with [Prokka](https://github.com/tseema
 7. [ Limitations ](#limitations)
 8. [ Publication ](#publication)
 9. [ References ](#references)
+10. [ FAQ ](#faq)
 
 <a name="about"></a>
 
@@ -255,3 +256,13 @@ In particular, RIBAP takes advantage of and uses the following tools:
 > Conway, Jake R., Alexander Lex, and Nils Gehlenborg. "UpSetR: an R package for the visualization of intersecting sets and their properties." Bioinformatics (2017).
 
 [Code](https://github.com/hms-dbmi/UpSetR) | [Publication](https://doi.org/10.1093/bioinformatics/btx364)
+
+
+<a name="faq"></a>
+
+# FAQ
+
+1) Since Nextflow 23.07.0-edge, Nextflow no longer mounts the host’s home directory when using Apptainer or Singularity. This causes issues in some dependencies. As a workaround, you can revert to the old behavior by setting the environment variable `NXF_APPTAINER_HOME_MOUNT` or `NXF_SINGULARITY_HOME_MOUNT` to `true` in the machine from which you launch the pipeline. From: [https://www.nextflow.io/docs/edge/container.html](https://www.nextflow.io/docs/edge/container.html).
+
+2) RIBAP might fail due to `RecursionError: maximum recursion depth exceeded in comparison`. This can happen in the current combining step where Roary initial clusters are combined with the ILP results. This is done in a Python script where the default recursion depth is 1000. If this happens, you can increase the recursion depth via the parameter `--set_recursion_limit`. However, be careful not increasing this too much (we tested until 5000). See als [https://github.com/hoelzer-lab/ribap/issues/66](https://github.com/hoelzer-lab/ribap/issues/66)
+
