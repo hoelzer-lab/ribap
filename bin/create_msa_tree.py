@@ -18,6 +18,7 @@ import shutil
 
 dirPath = sys.argv[1]
 ribapTable = sys.argv[2]
+wasRenamed = sys.argv[3]
 
 msaPath = f"{dirPath}/msa/"
 
@@ -29,7 +30,10 @@ for file in glob.glob("**/*.faa"):
   NUMSTRAINS += 1
   basename = os.path.basename(file)
   for record in SeqIO.parse(file, 'fasta'):
-    basename = basename.replace("_RENAMED.faa", '')
+    if len(wasRenamed) > 1:
+      basename = basename.replace(".faa", '')
+    else:
+      basename = basename.replace("_RENAMED.faa", '')
     geneID = record.id.split('_')[1]
     geneID = f"{basename}_{geneID}"
     id2strain[record.id] = geneID

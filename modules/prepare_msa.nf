@@ -18,7 +18,7 @@ process prepare_msa {
       cp *.faa faa/
 
       mkdir msa
-      create_msa_tree.py . ${holy_ribap_csv}
+      create_msa_tree.py . ${holy_ribap_csv} '${params.annotation_file}'
       #mv msa/*.faa .
     """
 }
