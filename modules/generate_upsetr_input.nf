@@ -38,7 +38,10 @@ with open(input_file) as holytable:
             strain = line.split('\\t')
             my_list = strain[3:]
             for i in my_list:
-                my_dict[i + '_RENAMED'] = []
+                if len(${params.annotation_file}) > 1:
+                    my_dict[i] = []
+                else:
+                    my_dict[i + '_RENAMED'] = []
         else:
             ids = line.split('\\t')
             for x in line.split('\\t')[3:]:
