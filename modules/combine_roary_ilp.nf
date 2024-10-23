@@ -6,13 +6,14 @@ process combine_roary_ilp {
   publishDir "${params.output}/05-combine", mode: 'copy', pattern: "*.txt" 
 
   input: 
-    tuple val(ident), file(roary), file(strain_ids), file(prokka_gff)
-    file(solved_ilps)
+    tuple val(ident), path(roary), path(strain_ids), path(prokka_gff)
+    path(solved_ilps)
+    path(script)
 
   output:
-    tuple val(ident), file("holy*.csv")
-    tuple val(ident), file("ribap*.csv")
-    tuple val(ident), file("*.txt")
+    tuple val(ident), path("holy*.csv")
+    tuple val(ident), path("ribap*.csv")
+    tuple val(ident), path("*.txt")
 
   script:
     """
@@ -22,7 +23,8 @@ process combine_roary_ilp {
     mkdir prokka
     cp *.gff prokka/
 
-    combine_roary_ilp.py ${strain_ids} ${ident}/gene_presence_absence.csv solved/ holy_python_ribap_"${ident}".csv ${ident} > ribap_roary"${ident}"_summary.txt
+    # setrecursionlimit see: https://github.com/hoelzer-lab/ribap/issues/66
+    python -c "import sys;sys.setrecursionlimit(${params.set_recursion_limit});exec(open('combine_roary_ilp.py').read())" ${strain_ids} ${ident}/gene_presence_absence.csv solved/ holy_python_ribap_"${ident}".csv ${ident} > ribap_roary"${ident}"_summary.txt
     """
 }
 

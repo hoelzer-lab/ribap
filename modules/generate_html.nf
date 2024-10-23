@@ -9,14 +9,13 @@ process generate_html {
     file(roary)
     file(individual_annotations)
     file(tree_svg) 
+    file(web_dir)
 
   output:
     file("web")
 
   script:
     """
-    cp "$baseDir/data/web.tar.gz" .
-    #wget https://www.rna.uni-jena.de/supplements/ribap/web.tar.gz
     tar zxvf web.tar.gz
     
     mkdir tree
