@@ -266,3 +266,7 @@ In particular, RIBAP takes advantage of and uses the following tools:
 
 2) RIBAP might fail due to `RecursionError: maximum recursion depth exceeded in comparison`. This can happen in the current combining step where Roary initial clusters are combined with the ILP results. This is done in a Python script where the default recursion depth is 1000. If this happens, you can increase the recursion depth via the parameter `--set_recursion_limit`. However, be careful not increasing this too much (we tested until 5000). See als [https://github.com/hoelzer-lab/ribap/issues/66](https://github.com/hoelzer-lab/ribap/issues/66)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=hoelzer-lab/ribap&type=date&legend=top-left)](https://www.star-history.com/#hoelzer-lab/ribap&type=date&legend=top-left)
+
